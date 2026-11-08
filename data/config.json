@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-08",
+  "siteNote": "教材は学習用です。AIの出力や成果、料金・公式情報は保証しません。公式情報は変わるため、リンク先で最新版を確認してください。",
+  "links": {
+    "freeNote": {
+      "label": "無料noteの受け取り記事を開く",
+      "url": "https://note.com/shibusawa_eichi/n/n0a67d2500b55",
+      "enabled": true,
+      "shownIn": ["step-6", "final"],
+      "note": "既存の無料note。STEP 6の内容と合う想定。公開前に本文・リンクを現物確認すること。"
+    },
+    "paidNote": {
+      "label": "有料note（AI開発初心者のためのGitHub運用スターターキット）",
+      "url": "https://note.com/shibusawa_eichi/n/n05cc647f22e9",
+      "enabled": false,
+      "shownIn": ["step-7"],
+      "note": "2026-11-08確認：販売ページはGitHub運用スターターキットで、仕様書の『AI開発の指示文テンプレート集』（修正・レビュー・引き継ぎ）とは内容が一致しない。STEP 7への導線は不一致のため無効。GitHub寄りの内容としてSTEP 6側での利用可否を本人が判断する。"
+    },
+    "coconala": {
+      "label": "ココナラの出品ページを開く",
+      "url": "https://coconala.com/services/4356310",
+      "enabled": true,
+      "shownIn": ["step-7"],
+      "note": "2026-11-08確認：出品は『AI開発の作業ルール整理』（変更範囲・完了報告・AI役割分担を1点のMDに整理、5,000円、納品3日予定）。STEP 4・5の作業範囲と完了報告の内容と一致するため有効化。価格は確認時点の表示。購入前に出品ページで再確認する。"
+    },
+    "membership": {
+      "label": "noteメンバーシップ（準備中）",
+      "url": "",
+      "enabled": false,
+      "shownIn": ["home", "step-7"],
+      "note": "2026-11-08時点で未開設。月額980円予定。URLが確定し公開されるまでURLは設定しない。準備中として表示する。"
+    },
+    "officialLine": {
+      "label": "公式LINEを開く",
+      "url": "https://lin.ee/TwwzeZS",
+      "enabled": true,
+      "shownIn": ["final"],
+      "note": "2026-11-08確認：Notion『渋沢A壱｜ブランド理念…』の2026-10-28追記（本人確認済みの『渋沢A壱 個人公式LINE』）に一致。Pace事務所LINE（lin.ee/RASTgAA）は別事業のため使わない。過去に案内された lin.ee/TCpcoz1 は未確認のため使わない。"
+    }
+  },
+  "officialClaudeCodeDocs": "https://code.claude.com/docs/en/setup",
+  "allowedExternalHosts": ["note.com", "coconala.com", "code.claude.com", "lin.ee"]
+}

@@ -1,0 +1,611 @@
+/* Claude CodeのSTEP｜MVP
+ * - 静的Web。バックエンド・外部スクリプトなし。
+ * - 教材本文は data/*.json から読み込み、textContent / createElement のみで描画する（HTML注入を防ぐ）。
+ * - 進捗（チェック状態）だけを localStorage に保存する。保存できなくても学習は継続できる。
+ */
+(function () {
+  "use strict";
+
+  var DATA_DIR = "data/";
+  var STORAGE_KEY = "claude-code-step:progress:v1";
+  var TOTAL_LABEL = "STEP 0〜7";
+
+  var state = {
+    steps: [],
+    glossary: null,
+    config: null,
+    progress: { checks: {}, lastStepId: null },
+    storageOk: true,
+    memoryOnly: {}
+  };
+
+  var app = document.getElementById("app");
+  var statusRegion = document.getElementById("status");
+  var storeNotice = document.getElementById("store-notice");
+
+  /* ---------- 進捗（localStorage：失敗しても動く） ---------- */
+
+  function loadProgress() {
+    try {
+      var raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object" && parsed.checks) {
+          state.progress = parsed;
+        }
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function saveProgress() {
+    if (!state.storageOk) return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
+    } catch (e) {
+      state.storageOk = false;
+      if (storeNotice) storeNotice.hidden = false;
+    }
+  }
+
+  function getChecks(stepId) {
+    return state.progress.checks[stepId] || [];
+  }
+
+  function setCheck(stepId, index, value) {
+    var step = findStep(stepId);
+    var arr = (state.progress.checks[stepId] || []).slice();
+    for (var i = 0; i < step.checklist.length; i++) {
+      if (arr[i] === undefined) arr[i] = false;
+    }
+    arr[index] = !!value;
+    state.progress.checks[stepId] = arr;
+    saveProgress();
+  }
+
+  function isStepComplete(step) {
+    var checks = getChecks(step.id);
+    if (!step.checklist.length) return false;
+    for (var i = 0; i < step.checklist.length; i++) {
+      if (!checks[i]) return false;
+    }
+    return true;
+  }
+
+  function completedCount() {
+    var n = 0;
+    state.steps.forEach(function (s) { if (isStepComplete(s)) n++; });
+    return n;
+  }
+
+  function setLastStep(stepId) {
+    state.progress.lastStepId = stepId;
+    saveProgress();
+  }
+
+  /* ---------- 共通ユーティリティ ---------- */
+
+  function findStep(id) {
+    for (var i = 0; i < state.steps.length; i++) {
+      if (state.steps[i].id === id) return state.steps[i];
+    }
+    return null;
+  }
+
+  function stepIndex(id) {
+    for (var i = 0; i < state.steps.length; i++) {
+      if (state.steps[i].id === id) return i;
+    }
+    return -1;
+  }
+
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        var v = attrs[k];
+        if (k === "text") { node.textContent = v; return; }
+        if (k === "class") { node.className = v; return; }
+        if (v === false || v === null || v === undefined) return;
+        if (v === true) node.setAttribute(k, "");
+        else node.setAttribute(k, String(v));
+      });
+    }
+    (children || []).forEach(function (c) {
+      if (c === null || c === undefined || c === false) return;
+      node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+    return node;
+  }
+
+  function say(message) {
+    if (statusRegion) statusRegion.textContent = message;
+  }
+
+  /* 外部リンクの許可リスト判定：https かつ許可ホストのみ */
+  function isAllowedExternal(url) {
+    try {
+      var u = new URL(url);
+      if (u.protocol !== "https:") return false;
+      var hosts = (state.config && state.config.allowedExternalHosts) || [];
+      return hosts.some(function (h) {
+        return u.hostname === h || u.hostname.slice(-(h.length + 1)) === "." + h;
+      });
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function externalLink(label, url) {
+    return el("a", {
+      href: url,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      text: label + "（外部サイトへ）"
+    });
+  }
+
+  /* 教材リンク：config の enabled と許可リストの両方を満たすときだけ表示 */
+  function linkByKey(key) {
+    var item = state.config.links[key];
+    if (!item || !item.enabled || !item.url) return null;
+    if (!isAllowedExternal(item.url)) return null;
+    return externalLink(item.label, item.url);
+  }
+
+  function relatedLinkFor(step) {
+    if (!step.relatedUrl || !isAllowedExternal(step.relatedUrl)) return null;
+    return externalLink("公式・関連ページ", step.relatedUrl);
+  }
+
+  /* ---------- 指示文コピー ---------- */
+
+  function copyText(text, button) {
+    function ok() {
+      say("指示文をコピーしました。");
+      if (button) flashButton(button, "コピーしました");
+    }
+    function ng() {
+      say("コピーできませんでした。指示文を選択して手動でコピーしてください。");
+      if (button) flashButton(button, "コピー失敗");
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, function () { fallbackCopy(text) ? ok() : ng(); });
+    } else {
+      fallbackCopy(text) ? ok() : ng();
+    }
+  }
+
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      var done = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return done;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function flashButton(button, label) {
+    var original = button.getAttribute("data-label") || button.textContent;
+    button.setAttribute("data-label", original);
+    button.textContent = label;
+    window.setTimeout(function () { button.textContent = original; }, 1800);
+  }
+
+  /* ---------- 本文の描画（安全なブロック形式のみ） ---------- */
+
+  function renderBody(blocks) {
+    var wrap = el("div", { class: "body" });
+    (blocks || []).forEach(function (b) {
+      switch (b.type) {
+        case "heading":
+          wrap.appendChild(el("h3", { text: b.text }));
+          break;
+        case "p":
+          wrap.appendChild(el("p", { text: b.text }));
+          break;
+        case "ul":
+          wrap.appendChild(el("ul", null, (b.items || []).map(function (t) { return el("li", { text: t }); })));
+          break;
+        case "steps":
+          wrap.appendChild(el("ol", { class: "try-steps" }, (b.items || []).map(function (t) { return el("li", { text: t }); })));
+          break;
+        case "note":
+          wrap.appendChild(el("p", { class: "note", text: b.text }));
+          break;
+        default:
+          break;
+      }
+    });
+    return wrap;
+  }
+
+  /* STEP画像（16:9）。alt必須。表示が崩れないよう幅・高さを指定し、遅延読み込みにする */
+  function renderStepImage(image) {
+    if (!image || !image.src || !image.alt) return null;
+    if (image.src.indexOf("assets/images/step/") !== 0) return null;
+    var img = el("img", {
+      src: image.src,
+      alt: image.alt,
+      width: 1376,
+      height: 768,
+      loading: "lazy",
+      decoding: "async",
+      class: "step-image"
+    });
+    return el("figure", { class: "step-figure" }, [img]);
+  }
+
+  function renderPrompt(prompt) {
+    if (!prompt) return null;
+    var button = el("button", { type: "button", class: "btn", text: "指示文をコピー" });
+    var pre = el("pre", { class: "prompt" }, [el("code", { text: prompt })]);
+    button.addEventListener("click", function () { copyText(prompt, button); });
+    return el("section", { class: "card", "aria-labelledby": "prompt-h" }, [
+      el("h3", { id: "prompt-h", text: "コピーする：指示文" }),
+      pre,
+      el("div", { class: "row" }, [button])
+    ]);
+  }
+
+  /* ---------- 画面：トップ ---------- */
+
+  function viewHome() {
+    var total = state.steps.length;
+    var done = completedCount();
+    var last = state.progress.lastStepId ? findStep(state.progress.lastStepId) : null;
+    var resumeTarget = last || state.steps[0];
+
+    var children = [
+      el("h1", { text: "Claude CodeのSTEP" }),
+      el("p", { class: "lead", text: "Claude Codeの初回操作から、AIへの指示の書き方、作業ファイルの守り方、GitHubの入口までを、一歩ずつ学べる無料の教材です。" }),
+      el("ul", { class: "facts" }, [
+        el("li", { text: "STEP 0〜7はすべて無料で利用できます。" }),
+        el("li", { text: "初心者はSTEP 0から始めてください。経験者は、必要なSTEPから選んで始められます。" }),
+        el("li", { text: "各STEPにはチェックリストと、指示文のコピーボタンがあります。" }),
+        el("li", { text: "GitHub・バックアップ・安全な運用まで学べます。" }),
+        el("li", { text: "対象：Claude Codeを初めて使う人。所要時間の目安はSTEPごとに数分〜30分程度です（個人差があります）。" }),
+        el("li", { text: "個人情報の入力は不要です。進捗はこのブラウザ内にだけ保存されます。" })
+      ]),
+      el("p", { class: "progress-line", text: "進捗：" + done + " / " + total + " STEP 完了" }),
+      el("div", { class: "row" }, [
+        el("a", { class: "btn primary", href: "#/step/" + resumeTarget.id, text: done === 0 ? "STEP 0 から始める" : "続きから再開（" + resumeTarget.title + "）" }),
+        el("a", { class: "btn", href: "#/steps", text: "STEP一覧" })
+      ]),
+      el("div", { class: "row" }, [
+        el("a", { class: "btn", href: "#/search", text: "用語・困りごと検索" }),
+        el("a", { class: "btn", href: "#/final", text: "最終チェック" })
+      ]),
+      guideCard(),
+      el("p", { class: "note", text: state.config.siteNote })
+    ];
+    return children;
+  }
+
+  /* 無料教材の周辺案内。未公開の項目は「準備中」と表示し、URLは設定しない */
+  function guideCard() {
+    var rows = [
+      { name: "無料note", desc: "STEPの使い方と受け取り案内（無料）", key: "freeNote" },
+      { name: "公式LINE", desc: "更新のお知らせ（任意。登録は必須ではありません）", key: "officialLine" },
+      { name: "noteメンバーシップ", desc: "追加教材・更新版・実践例（「AI開発の道具箱｜STEP実践室」、月額980円予定）", key: "membership" },
+      { name: "ココナラ", desc: "個別のAI開発作業ルール整理（有料の個別相談）", key: "coconala" }
+    ];
+    var list = el("ul", { class: "guide-list" }, rows.map(function (r) {
+      var link = linkByKey(r.key);
+      return el("li", null, [
+        el("strong", { text: r.name }),
+        el("span", { text: "：" + r.desc }),
+        el("br"),
+        link || el("span", { class: "coming", text: "準備中" })
+      ]);
+    }));
+    return el("section", { class: "card", "aria-labelledby": "guide-h" }, [
+      el("h3", { id: "guide-h", text: "続けて学ぶ・支援の案内" }),
+      el("p", { text: "STEP 0〜7は無料です。以下は任意の案内です。学習の途中で購入を求めることはありません。" }),
+      list
+    ]);
+  }
+
+  /* ---------- 画面：STEP一覧 ---------- */
+
+  function viewStepList() {
+    var list = el("ol", { class: "step-list" });
+    state.steps.forEach(function (s) {
+      var complete = isStepComplete(s);
+      list.appendChild(el("li", null, [
+        el("a", { href: "#/step/" + s.id, class: "step-link" + (complete ? " is-done" : "") }, [
+          el("span", { class: "step-no", text: "STEP " + s.order }),
+          el("span", { class: "step-title", text: s.title }),
+          el("span", { class: "step-badge", text: complete ? "完了" : "未完了" })
+        ])
+      ]));
+    });
+    return [
+      el("h1", { text: "STEP一覧" }),
+      el("p", { class: "lead", text: TOTAL_LABEL + "を順番に進めます。完了済みのSTEPには「完了」と表示されます。" }),
+      list
+    ];
+  }
+
+  /* ---------- 画面：STEP詳細 ---------- */
+
+  function viewStep(id) {
+    var step = findStep(id);
+    if (!step) return [el("h1", { text: "STEPが見つかりません" }), el("p", { text: "一覧から選び直してください。" }), el("a", { class: "btn", href: "#/steps", text: "STEP一覧へ" })];
+    setLastStep(step.id);
+
+    var idx = stepIndex(step.id);
+    var prev = idx > 0 ? state.steps[idx - 1] : null;
+    var next = idx < state.steps.length - 1 ? state.steps[idx + 1] : null;
+
+    var checklistWrap = el("section", { class: "card", "aria-labelledby": "check-h" });
+    checklistWrap.appendChild(el("h3", { id: "check-h", text: "チェックする" }));
+    var checks = getChecks(step.id);
+    var ul = el("ul", { class: "checklist" });
+    step.checklist.forEach(function (text, i) {
+      var cid = "chk-" + step.id + "-" + i;
+      var input = el("input", { type: "checkbox", id: cid, checked: !!checks[i] });
+      input.addEventListener("change", function () {
+        setCheck(step.id, i, input.checked);
+        say(input.checked ? "チェックを保存しました。" : "チェックを外しました。");
+        if (isStepComplete(step)) say("このSTEPの確認が全て済みました。");
+      });
+      ul.appendChild(el("li", null, [input, el("label", { for: cid, text: text })]));
+    });
+    checklistWrap.appendChild(ul);
+    if (!state.storageOk) checklistWrap.appendChild(el("p", { class: "note", text: "この環境では進捗を保存できないため、ページを離れるとチェックは消えます。学習自体は続けられます。" }));
+
+    var nextLinks = [];
+    var relLink = relatedLinkFor(step);
+    if (relLink) nextLinks.push(relLink);
+    if (step.nextLinks) {
+      step.nextLinks.forEach(function (k) {
+        var l = linkByKey(k);
+        if (l) nextLinks.push(l);
+      });
+    }
+
+    var nav = el("nav", { class: "pager", "aria-label": "STEPの移動" }, [
+      prev ? el("a", { class: "btn", href: "#/step/" + prev.id, text: "← 前へ：" + prev.title }) : el("span"),
+      next ? el("a", { class: "btn primary", href: "#/step/" + next.id, text: "次へ：" + next.title + " →" }) : el("a", { class: "btn primary", href: "#/final", text: "最終チェックへ →" })
+    ]);
+
+    var children = [
+      el("p", { class: "crumb", text: "STEP " + step.order + " / " + (state.steps.length - 1) + "　" + (isStepComplete(step) ? "（完了）" : "（未完了）") }),
+      el("h1", { text: step.title }),
+      el("p", { class: "lead", text: step.summary }),
+      renderStepImage(step.image),
+      renderBody(step.body),
+      renderPrompt(step.prompt),
+      checklistWrap
+    ];
+    if (nextLinks.length) {
+      children.push(el("section", { class: "card", "aria-labelledby": "more-h" }, [
+        el("h3", { id: "more-h", text: "関連教材" }),
+        el("ul", null, nextLinks.map(function (a) { return el("li", null, [a]); }))
+      ]));
+    }
+    if (step.nextText) children.push(el("p", { class: "next-text", text: "次へ進む：" + step.nextText }));
+    children.push(nav);
+    children.push(el("p", { class: "meta", text: "教材の更新日：" + step.updatedAt }));
+    return children;
+  }
+
+  /* ---------- 画面：検索 ---------- */
+
+  function textOfStep(s) {
+    var parts = [s.title, s.summary, s.prompt || ""];
+    (s.body || []).forEach(function (b) {
+      if (b.text) parts.push(b.text);
+      if (b.items) parts = parts.concat(b.items);
+    });
+    parts = parts.concat(s.checklist || []);
+    return parts.join("\n");
+  }
+
+  function viewSearch(query) {
+    var q = (query || "").trim();
+    var lower = q.toLowerCase();
+    var input = el("input", { type: "search", id: "q", name: "q", value: q, placeholder: "例：指示文、バックアップ、GitHub", "aria-label": "キーワード検索", class: "search-input" });
+    var form = el("form", { class: "search-form", role: "search" }, [input, el("button", { type: "submit", class: "btn primary", text: "検索" })]);
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      location.hash = "#/search?q=" + encodeURIComponent(input.value.trim());
+    });
+
+    var children = [el("h1", { text: "用語・困りごと検索" }), form];
+    if (!q) {
+      children.push(el("p", { class: "lead", text: "キーワードを入れると、STEP・用語集・困りごとを探せます。" }));
+      return children;
+    }
+
+    var stepHits = state.steps.filter(function (s) { return textOfStep(s).toLowerCase().indexOf(lower) !== -1; });
+    var termHits = (state.glossary.items || []).filter(function (g) { return (g.term + g.meaning).toLowerCase().indexOf(lower) !== -1; });
+    var troubleHits = (state.glossary.troubles || []).filter(function (t) { return (t.question + t.answer).toLowerCase().indexOf(lower) !== -1; });
+
+    children.push(el("h2", { text: "STEP（" + stepHits.length + "件）" }));
+    children.push(stepHits.length
+      ? el("ul", null, stepHits.map(function (s) { return el("li", null, [el("a", { href: "#/step/" + s.id, text: "STEP " + s.order + "：" + s.title })]); }))
+      : el("p", { text: "一致するSTEPはありません。" }));
+
+    children.push(el("h2", { text: "用語（" + termHits.length + "件）" }));
+    children.push(termHits.length
+      ? el("dl", { class: "glossary" }, termHits.reduce(function (acc, g) {
+          acc.push(el("dt", { text: g.term }));
+          acc.push(glossaryDd(g.meaning, g.stepIds));
+          return acc;
+        }, []))
+      : el("p", { text: "一致する用語はありません。" }));
+
+    children.push(el("h2", { text: "困りごと（" + troubleHits.length + "件）" }));
+    children.push(troubleHits.length
+      ? el("dl", { class: "glossary" }, troubleHits.reduce(function (acc, t) {
+          acc.push(el("dt", { text: t.question }));
+          acc.push(glossaryDd(t.answer, t.stepIds));
+          return acc;
+        }, []))
+      : el("p", { text: "一致する困りごとはありません。" }));
+    return children;
+  }
+
+  /* 用語・困りごとの説明と、関連STEPへのリンク（既存のSTEPルートのみ使用） */
+  function glossaryDd(text, stepIds) {
+    var links = (stepIds || []).filter(function (id) { return findStep(id); }).map(function (id) {
+      var s = findStep(id);
+      return el("a", { href: "#/step/" + s.id, text: "STEP " + s.order + "：" + s.title });
+    });
+    var children = [el("span", { text: text })];
+    if (links.length) {
+      children.push(el("br"));
+      children.push(el("span", { class: "related", text: "関連STEP：" }));
+      links.forEach(function (a, i) {
+        if (i > 0) children.push(el("span", { text: "・" }));
+        children.push(a);
+      });
+    }
+    return el("dd", null, children);
+  }
+
+  /* ---------- 画面：最終チェック ---------- */
+
+  function viewFinal() {
+    var done = completedCount();
+    var total = state.steps.length;
+    var list = el("ul", { class: "checklist-summary" });
+    state.steps.forEach(function (s) {
+      var complete = isStepComplete(s);
+      list.appendChild(el("li", null, [
+        el("a", { href: "#/step/" + s.id, text: "STEP " + s.order + "：" + s.title }),
+        el("span", { text: complete ? "　完了" : "　未完了" })
+      ]));
+    });
+    var children = [
+      el("h1", { text: "最終チェック" }),
+      el("p", { class: "lead", text: "完了：" + done + " / " + total + " STEP" }),
+      list
+    ];
+    if (done === total) {
+      children.push(el("p", { text: "STEP 0〜7の確認がすべて済みました。おつかれさまでした。" }));
+    } else {
+      children.push(el("p", { text: "未完了のSTEPは、上のリンクから確認を再開できます。" }));
+    }
+    var fl = linkByKey("freeNote");
+    if (fl) children.push(el("p", null, [fl]));
+    var line = linkByKey("officialLine");
+    if (line) children.push(el("p", { text: "更新のお知らせは、任意で公式LINEから案内しています（登録は必須ではありません）。" }), el("p", null, [line]));
+    return children;
+  }
+
+  /* ---------- ルーター ---------- */
+
+  function route() {
+    var raw = location.hash.replace(/^#/, "") || "/";
+    var parts = raw.split("?");
+    var path = parts[0];
+    var query = "";
+    if (parts[1]) {
+      var m = parts[1].match(/(?:^|&)q=([^&]*)/);
+      if (m) { try { query = decodeURIComponent(m[1].replace(/\+/g, " ")); } catch (e) { query = ""; } }
+    }
+
+    var content;
+    var focusTitle = true;
+    var titleText = "Claude CodeのSTEP";
+    if (path === "/" || path === "") {
+      content = viewHome();
+    } else if (path === "/steps") {
+      content = viewStepList();
+    } else if (path.indexOf("/step/") === 0) {
+      var id = path.slice("/step/".length);
+      content = viewStep(id);
+      var s = findStep(id);
+      if (s) titleText = "STEP " + s.order + "：" + s.title;
+    } else if (path === "/search") {
+      content = viewSearch(query);
+    } else if (path === "/final") {
+      content = viewFinal();
+    } else {
+      content = [el("h1", { text: "ページが見つかりません" }), el("a", { class: "btn", href: "#/", text: "トップへ戻る" })];
+    }
+
+    app.innerHTML = "";
+    content.forEach(function (node) { if (node) app.appendChild(node); });
+    document.title = titleText + " | Claude CodeのSTEP";
+    updateNav(path);
+    if (focusTitle) {
+      var h1 = app.querySelector("h1");
+      if (h1) { h1.setAttribute("tabindex", "-1"); h1.focus({ preventScroll: false }); }
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function updateNav(path) {
+    var links = document.querySelectorAll("[data-nav]");
+    for (var i = 0; i < links.length; i++) {
+      var key = links[i].getAttribute("data-nav");
+      var active = (key === "home" && (path === "/" || path === "")) ||
+                   (key === "steps" && (path === "/steps" || path.indexOf("/step/") === 0)) ||
+                   (key === "search" && path === "/search") ||
+                   (key === "final" && path === "/final");
+      if (active) links[i].setAttribute("aria-current", "page");
+      else links[i].removeAttribute("aria-current");
+    }
+  }
+
+  /* ---------- 起動 ---------- */
+
+  function fetchJson(name) {
+    return fetch(DATA_DIR + name, { cache: "no-cache" }).then(function (r) {
+      if (!r.ok) throw new Error(name + " " + r.status);
+      return r.json();
+    });
+  }
+
+  function showFatal(message) {
+    app.innerHTML = "";
+    app.appendChild(el("h1", { text: "教材を読み込めませんでした" }));
+    app.appendChild(el("p", { text: message }));
+    app.appendChild(el("p", { text: "このアプリは data/ フォルダの教材データを読み込みます。README.md の「ローカルで開く」を参照し、Webサーバー経由で開いてください。" }));
+  }
+
+  /* スキップリンクはハッシュルーターと衝突させない（#app へ遷移すると画面が壊れるため） */
+  function bindSkipLink() {
+    var skip = document.querySelector(".skip");
+    if (!skip) return;
+    skip.addEventListener("click", function (e) {
+      e.preventDefault();
+      app.focus();
+      app.scrollIntoView({ block: "start" });
+    });
+  }
+
+  function start() {
+    bindSkipLink();
+    state.storageOk = loadProgress();
+    if (!state.storageOk && storeNotice) storeNotice.hidden = false;
+    Promise.all([fetchJson("steps.json"), fetchJson("glossary.json"), fetchJson("config.json")])
+      .then(function (res) {
+        state.steps = (res[0].steps || []).slice().sort(function (a, b) { return a.order - b.order; });
+        state.glossary = res[1];
+        state.config = res[2];
+        window.addEventListener("hashchange", route);
+        if (!location.hash) location.hash = "#/";
+        route();
+      }, function (err) {
+        /* 読み込み失敗のみこの案内を出す（描画時の例外と区別する） */
+        showFatal("読み込みエラー：" + err.message);
+      });
+  }
+
+  start();
+})();
