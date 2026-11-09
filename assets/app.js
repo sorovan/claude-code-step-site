@@ -505,6 +505,21 @@
 
   /* ---------- 画面：STEP詳細 ---------- */
 
+  function stepRail(current) {
+    var list = el("ol", { class: "step-rail-list" });
+    state.steps.forEach(function (s) {
+      var link = el("a", { href: "#/step/" + s.id, text: "STEP " + s.order + "　" + s.title });
+      if (s.id === current.id) link.setAttribute("aria-current", "page");
+      list.appendChild(el("li", { class: s.id === current.id ? "is-current" : "" }, [link]));
+    });
+    return el("aside", { class: "step-rail", "aria-label": "STEPの目次" }, [
+      el("p", { class: "eyebrow", text: "LEARNING PATH" }),
+      el("h2", { text: "STEPの目次" }),
+      el("p", { class: "rail-progress", text: completedCount() + " / " + state.steps.length + " 完了" }),
+      list
+    ]);
+  }
+
   function viewStep(id) {
     var step = findStep(id);
     if (!step) return [el("h1", { text: "STEPが見つかりません" }), el("p", { text: "一覧から選び直してください。" }), el("a", { class: "btn", href: "#/steps", text: "STEP一覧へ" })];
@@ -567,7 +582,9 @@
     if (step.nextText) children.push(el("p", { class: "next-text", text: "次へ進む：" + step.nextText }));
     children.push(nav);
     children.push(el("p", { class: "meta", text: "教材の更新日：" + step.updatedAt }));
-    return [el("div", { class: "lesson-page" }, children)];
+    return [el("div", { class: "lesson-page" }, [
+      el("div", { class: "lesson-layout" }, [stepRail(step), el("div", { class: "lesson-content" }, children)])
+    ])];
   }
 
   /* ---------- 画面：検索 ---------- */
