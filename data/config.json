@@ -33,10 +33,10 @@
     },
     "officialLine": {
       "label": "公式LINEを開く",
-      "url": "https://lin.ee/TwwzeZS",
+      "url": "https://lin.ee/8NRgx9E",
       "enabled": true,
       "shownIn": ["final"],
-      "note": "2026-11-08確認：Notion『渋沢A壱｜ブランド理念…』の2026-10-28追記（本人確認済みの『渋沢A壱 個人公式LINE』）に一致。Pace事務所LINE（lin.ee/RASTgAA）は別事業のため使わない。過去に案内された lin.ee/TCpcoz1 は未確認のため使わない。"
+      "note": "2026-11-09 承認確定URL。LINE側疎通・配布版確認は別工程。"
     }
   },
   "officialClaudeCodeDocs": "https://code.claude.com/docs/en/setup",
