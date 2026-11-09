@@ -310,6 +310,7 @@ h3 { font-size: 1.08rem; font-weight: 700; margin: 1.3em 0 0.4em; }
 .quickstart-item .card {
   margin: 16px 0 0;
   background: var(--note-bg);
+  color: var(--fg);
 }
 .quickstart-item .card h3 { margin-top: 0; }
 .quickstart-arrow {
@@ -489,6 +490,8 @@ pre.prompt {
 :root {
   --accent-soft: #fff1e8;
   --surface-soft: #f5f0e8;
+  --text-on-soft: #23272f;
+  --link-on-soft: #9a3412;
   --shadow-soft: 0 10px 28px rgba(35, 39, 47, 0.07);
   --radius-lg: 18px;
 }
@@ -592,7 +595,8 @@ pre.prompt {
 .lesson-content > .body .try-steps { list-style: none; padding-left: 0; counter-reset: lesson-step; }
 .lesson-content > .body .try-steps li { counter-increment: lesson-step; position: relative; min-height: 38px; margin: 12px 0; padding: 5px 0 5px 46px; }
 .lesson-content > .body .try-steps li::before { content: counter(lesson-step); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--accent-fg); font-weight: 800; }
-.prompt-card { background: var(--surface-soft); }
+.prompt-card { background: var(--surface-soft); color: var(--text-on-soft); }
+.prompt-card pre.prompt { color: var(--fg); }
 .prompt-card h3, .check-card h3 { margin-bottom: 10px; }
 .check-card { border-left: 5px solid var(--done); }
 .pager { margin-top: 32px; }
@@ -639,7 +643,7 @@ pre.prompt {
 .home-lab-card summary::-webkit-details-marker { display: none; }
 .home-lab-card summary span { color: var(--accent); white-space: nowrap; }
 .home-lab-card > p, .home-lab-card > code { display: block; margin: 0; padding: 0 16px 14px; }
-.home-lab-card > code { padding-top: 12px; color: var(--fg); background: var(--surface-soft); font-family: inherit; font-size: .86rem; white-space: pre-wrap; }
+.home-lab-card > code { padding-top: 12px; color: var(--text-on-soft); background: var(--surface-soft); font-family: inherit; font-size: .86rem; white-space: pre-wrap; }
 
 @media (max-width: 700px) {
   .home-hero { grid-template-columns: 1fr; gap: 24px; padding: 30px 22px; }
@@ -855,7 +859,7 @@ pre.prompt {
 .lesson-page .prompt-card,
 .lesson-page .check-card,
 .lesson-page .lesson-content > .card { border: 2px solid var(--fg); border-radius: 0; box-shadow: 5px 6px 0 var(--fg); }
-.lesson-page .prompt-card { border-top: 8px solid var(--step-accent); background: var(--card); }
+.lesson-page .prompt-card { border-top: 8px solid var(--step-accent); background: var(--card); color: var(--fg); }
 .lesson-page .prompt { max-height: none; overflow-wrap: anywhere; white-space: pre-wrap; }
 .lesson-page .check-card { border-left: 8px solid var(--step-accent); }
 .lesson-page .checklist label { overflow-wrap: anywhere; }
@@ -879,3 +883,76 @@ pre.prompt {
   .lesson-page .pager .btn { width: 100%; }
 }
 
+/* Approved extension: share typography, controls and palette with the legacy STEP. */
+/* Fixed pale surfaces have their own foreground; never inherit theme-white ink. */
+.quickstart-guide, .quickstart-achievement,
+.lesson-content > .body > p:first-of-type,
+.lesson-content > .body h3,
+.step-rail-list li.is-current, .step-rail-list a:hover {
+  color: var(--text-on-soft);
+}
+.quickstart-guide a, .quickstart-achievement a,
+.prompt-card > a, .lesson-content > .body h3 a,
+.step-rail-list li.is-current a { color: var(--link-on-soft); }
+.lesson-page .lesson-content > .body .try-steps li::before,
+.lesson-page .pager .btn.primary { color: var(--text-on-soft); }
+/* Fixed illustration/card surfaces keep readable ink in every display theme. */
+.steps-page .step-link, .roadmap-item { color: #17191f !important; }
+.steps-page .step-link .step-title, .steps-page .step-link .step-no,
+.steps-page .step-link .step-badge, .steps-page .step-link small,
+.roadmap-item .roadmap-copy small, .roadmap-item .roadmap-no,
+.roadmap-item .roadmap-arrow { color: #17191f; }
+.home-lab .section-heading { background: #17191f; color: #fff; padding: 16px; }
+.home-lab .section-heading h2, .home-lab .lab-caption { color: #fff; }
+.home-lab .eyebrow { color: #ffca83; }
+.home-lab-visual, .tora-guide { background: #fff6e8; color: #17191f; }
+.tora-guide strong { color: #9a3412; }
+.home-start-preview .btn.dark { background: #17191f; color: #fff; border-color: #17191f; }
+.final-progress { background: #17191f; color: #fff; }
+.final-progress .eyebrow { color: #ffca83; }
+.steps-overview { background: #17191f; color: #fff; }
+.steps-overview .eyebrow { color: #ffca83; }
+.final-page .progress-line { background: #fff6e8; color: #17191f; padding: 12px; }
+@media (max-width: 700px) {
+  .header-inner { flex-wrap: wrap; gap: 12px; }
+  .main-nav { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px 10px; width: 100%; }
+  .main-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 8px; }
+  .display-controls { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; }
+  .theme-switch { display: flex; flex-direction: column; align-items: stretch; gap: 4px; flex: 1 1 140px; min-width: 0; }
+  .theme-switch select { width: 100%; max-width: 100%; min-height: 44px; }
+  .home-lab .section-heading { flex-wrap: wrap; }
+  .home-lab-visual { flex-wrap: wrap; }
+  .steps-page .step-link, .roadmap-item { overflow-wrap: anywhere; min-width: 0; }
+}
+.extension-page, .extension-items, .extension-grid, .extension-links, .extension-menu { min-width: 0; }
+.extension-hero { background: #242424; color: #fff; padding: clamp(1.3rem, 4vw, 3rem); border-top: 6px solid #ea580c; margin-bottom: 1.5rem; }
+.extension-hero h1 { color: #fff; }
+.extension-hero .eyebrow { color: #fdba74; }
+.extension-hero .lead { color: #fff; }
+.extension-menu, .extension-links { display: flex; flex-wrap: wrap; gap: .8rem; margin: 1rem 0; }
+.extension-menu { border-bottom: 2px solid #ea580c; padding: 0 0 1rem; }
+.extension-menu a { padding: .4rem .1rem; }
+.extension-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.extension-items { display: grid; gap: 1.2rem; }
+.extension-page section { margin-block: 1.4rem; scroll-margin-top: 1rem; }
+.extension-page .card, .extension-items .card, .extension-grid .card { min-width: 0; overflow-wrap: anywhere; }
+.extension-page .prompt-card { margin-block: .8rem; }
+.extension-page .prompt, .extension-items .prompt { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 100%; }
+.extension-page .pager { flex-wrap: wrap; }
+.extension-toc summary { font-weight: 700; cursor: pointer; padding: .5rem; }
+.extension-toc a, .extension-links a { overflow-wrap: anywhere; }
+.extension-checklist li { min-width: 0; }
+.extension-checklist label { overflow-wrap: anywhere; }
+.reading-state { font-weight: 700; border-left: 4px solid #ea580c; padding-left: .7rem; }
+.bookmark-feedback { min-height: 1.5em; margin: .5rem 0; }
+.bookmark-button[aria-pressed="true"], .extension-links button[aria-pressed="true"] { border: 2px solid #c2410c; font-weight: 700; }
+.line-qr { display: block; background: white; max-width: 100%; width: 230px; height: auto; }
+.line-page ol { padding-left: 1.5rem; }
+.line-page li { margin-bottom: .8rem; }
+.extension-tora { width: 160px; height: auto; max-width: 100%; }
+@media (max-width: 700px) {
+  .extension-hero { padding: 1.2rem; }
+  .extension-grid { grid-template-columns: 1fr; }
+  .extension-page h1 { font-size: 1.65em; overflow-wrap: anywhere; }
+  .extension-links .btn, .extension-page .btn { white-space: normal; max-width: 100%; }
+}

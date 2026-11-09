@@ -1,7 +1,7 @@
 /* Claude CodeのSTEP｜MVP
  * - 静的Web。バックエンド・外部スクリプトなし。
  * - 教材本文は data/*.json から読み込み、textContent / createElement のみで描画する（HTML注入を防ぐ）。
- * - 進捗（チェック状態）だけを localStorage に保存する。保存できなくても学習は継続できる。
+ * - 進捗と教材項目ブックマークを localStorage に保存する。保存できなくても学習は継続できる。
  */
 (function () {
   "use strict";
@@ -13,6 +13,7 @@
 
   var state = {
     steps: [],
+    extension: null,
     quickstart: null,
     questions: [],
     glossary: null,
@@ -29,14 +30,24 @@
 
   /* ---------- 進捗（localStorage：失敗しても動く） ---------- */
 
+  function validProgress(parsed) {
+    return parsed && typeof parsed === "object" && parsed.checks && typeof parsed.checks === "object" && !Array.isArray(parsed.checks);
+  }
+  function cleanChecks(checks) {
+    var result = Object.create(null);
+    Object.keys(checks).forEach(function (id) {
+      if (Array.isArray(checks[id])) result[id] = checks[id].map(function (v) { return v === true; });
+    });
+    return result;
+  }
+
   function loadProgress() {
     try {
       var raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         var parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === "object" && parsed.checks) {
-          state.progress = parsed;
-        }
+        if (!validProgress(parsed)) throw new Error("invalid progress");
+        state.progress = { checks: cleanChecks(parsed.checks), lastStepId: typeof parsed.lastStepId === "string" ? parsed.lastStepId : null };
       }
       return true;
     } catch (e) {
@@ -59,9 +70,8 @@
       var raw = window.localStorage.getItem(QUICKSTART_STORAGE_KEY);
       if (raw) {
         var parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === "object" && parsed.checks) {
-          state.quickstartProgress = parsed;
-        }
+        if (!validProgress(parsed)) throw new Error("invalid progress");
+        state.quickstartProgress = { checks: cleanChecks(parsed.checks) };
       }
       return true;
     } catch (e) {
@@ -337,13 +347,13 @@
         el("span", { class: "question-query", text: q.query + " →" })
       ]);
       button.addEventListener("click", function () {
-        location.hash = "#/search?q=" + encodeURIComponent(q.query);
+        location.hash = "#/questions?q=" + encodeURIComponent(q.id);
       });
       chips.appendChild(button);
     });
     return el("section", { class: "card question-entry", "aria-labelledby": "question-entry-h" }, [
       el("h2", { id: "question-entry-h", text: "今の疑問から探す" }),
-      el("p", { text: "質問を1つ選ぶと、既存の用語・困りごと検索へ移動します。" }),
+      el("p", { text: "質問を1つ選ぶと、関連する章と既存検索への入口が表示されます。" }),
       chips
     ]);
   }
@@ -418,8 +428,8 @@
       var input = el("input", { type: "checkbox", id: cid, checked: !!checks[i] });
       input.addEventListener("change", function () {
         setQuickCheck(item.id, i, input.checked);
-        say(input.checked ? "最初の15分の確認を保存しました。" : "確認を外しました。");
-        if (isQuickstartStepComplete(item)) say("この実践項目の確認がすべて済みました。");
+        say(state.storageOk ? (input.checked ? "最初の15分の確認を保存しました。" : "確認を外しました。") : "進捗を保存できませんでした。この画面内だけで有効です。");
+        if (state.storageOk && isQuickstartStepComplete(item)) say("この実践項目の確認がすべて済みました。");
         var achievement = document.querySelector("[data-quick-achievement]");
         if (achievement) achievement.hidden = quickstartCompletedCount() !== state.quickstart.steps.length;
       });
@@ -662,8 +672,8 @@
       var input = el("input", { type: "checkbox", id: cid, checked: !!checks[i] });
       input.addEventListener("change", function () {
         setCheck(step.id, i, input.checked);
-        say(input.checked ? "チェックを保存しました。" : "チェックを外しました。");
-        if (isStepComplete(step)) say("このSTEPの確認が全て済みました。");
+        say(state.storageOk ? (input.checked ? "チェックを保存しました。" : "チェックを外しました。") : "進捗を保存できませんでした。この画面内だけで有効です。");
+        if (state.storageOk && isStepComplete(step)) say("このSTEPの確認が全て済みました。");
       });
       ul.appendChild(el("li", null, [input, el("label", { for: cid, text: text })]));
     });
@@ -747,6 +757,7 @@
     var termHits = (state.glossary.items || []).filter(function (g) { return (g.term + g.meaning).toLowerCase().indexOf(lower) !== -1; });
     var troubleHits = (state.glossary.troubles || []).filter(function (t) { return (t.question + t.answer).toLowerCase().indexOf(lower) !== -1; });
 
+    children = children.concat(extensionSearch(q));
     children.push(el("h2", { text: "STEP（" + stepHits.length + "件）" }));
     children.push(stepHits.length
       ? el("div", { class: "search-results" }, stepHits.map(function (s) {
@@ -844,6 +855,191 @@
     return [el("div", { class: "final-page" }, children)];
   }
 
+  /* ---------- 承認済み16章拡張：旧教材を参照する独立した学習経路 ---------- */
+  var BOOKMARK_KEY = "claude-code-step:bookmarks:v1";
+  var bookmarkIds = [];
+  var bookmarkLoadWarning = "";
+
+  function byId(items, id) { return items.find(function (x) { return x.id === id; }); }
+  function extension() { return state.extension; }
+  function chapterLinks(ids) {
+    return el("div", { class: "extension-links" }, (ids || []).map(function (id) {
+      var c = byId(extension().chapters, id);
+      return c ? el("a", { href: "#/chapter/" + id, text: String(c.order).padStart(2, "0") + " " + c.title }) : null;
+    }));
+  }
+  function missingPage() { return [el("h1", { text: "ページが見つかりません" }), el("a", { href: "#/chapters", text: "16章の一覧へ戻る" })]; }
+  function extensionHeader(title, lead) {
+    return el("header", { class: "page-hero extension-hero" }, [el("p", { class: "eyebrow", text: "CLAUDE CODE / LEARNING PATH" }), el("h1", { text: title }), lead ? el("p", { class: "lead", text: lead }) : null]);
+  }
+  function extensionMenu() {
+    return el("nav", { class: "extension-menu", "aria-label": "16章と学習ツール" }, [
+      ["chapters", "16章"], ["questions", "質問から探す"], ["prompts", "依頼文12件"], ["glossary", "用語辞典"], ["bookmarks", "保存した項目"], ["line", "LINE受け取り"], ["steps", "旧STEP 0〜7"], ["final", "最終チェック"]
+    ].map(function (x) { return el("a", { href: "#/" + x[0], text: x[1] }); }));
+  }
+  function itemInfo(key) {
+    var parts = key.split("/"), type = parts[0], id = parts[1], data;
+    if (type === "prompt") { data = byId(extension().prompts, id); return data && { title: data.title, href: "#/prompt/" + id }; }
+    if (type === "learn") { data = byId(extension().chapters, id); return data && { title: data.title + "：学ぶ", href: "#/chapter/" + id }; }
+    if (type === "term" || type === "trouble") {
+      data = byId(type === "term" ? extension().terms : extension().troubles, id);
+      var source = data && (type === "term" ? state.glossary.items : state.glossary.troubles)[data.sourceIndex];
+      return source && { title: source.term || source.question, href: "#/" + type + "/" + id };
+    }
+    return null;
+  }
+  function loadBookmarks() {
+    try {
+      var raw = localStorage.getItem(BOOKMARK_KEY);
+      if (!raw) return;
+      var parsed = JSON.parse(raw);
+      if (!parsed || parsed.schemaVersion !== 1 || !Array.isArray(parsed.items)) throw new Error("invalid bookmarks");
+      bookmarkIds = parsed.items.filter(function (key, i, all) { return typeof key === "string" && itemInfo(key) && all.indexOf(key) === i; });
+      if (bookmarkIds.length !== parsed.items.length) bookmarkLoadWarning = "読み取れない保存項目を除いて表示しています。元データは自動削除していません。";
+    } catch (e) { bookmarkLoadWarning = "保存項目を読み取れませんでした。教材は利用できます。次に保存できたときに一覧を作り直します。"; }
+  }
+  function bookmarkButton(key) {
+    var button = el("button", { type: "button", class: "btn bookmark-button", "data-bookmark": key });
+    var feedback = el("p", { class: "bookmark-feedback", role: "status" });
+    function update() { var saved = bookmarkIds.indexOf(key) >= 0; button.setAttribute("aria-pressed", String(saved)); button.textContent = saved ? "保存を解除" : "この項目を保存"; }
+    update();
+    button.addEventListener("click", function () {
+      var saved = bookmarkIds.indexOf(key) >= 0;
+      var next = saved ? bookmarkIds.filter(function (id) { return id !== key; }) : bookmarkIds.concat(key);
+      try {
+        localStorage.setItem(BOOKMARK_KEY, JSON.stringify({ schemaVersion: 1, items: next }));
+        bookmarkIds = next;
+        bookmarkLoadWarning = "";
+        update();
+        feedback.textContent = saved ? "保存を解除しました。" : "この項目を保存しました。";
+      } catch (e) { feedback.textContent = "保存できませんでした。保存状態は変更していません。ブラウザの保存設定や空き容量を確認してください。"; }
+      say(feedback.textContent);
+    });
+    return el("div", { class: "bookmark-control" }, [button, feedback]);
+  }
+  function readingComplete(c) {
+    return c.checkRefs.every(function (ref) {
+      var item = ref.kind === "step" ? findStep(ref.id) : findQuickstartStep(ref.id);
+      var checks = ref.kind === "step" ? getChecks(ref.id) : getQuickChecks(ref.id);
+      return item && item.checklist.length && item.checklist.every(function (_, i) { return checks[i] === true; });
+    });
+  }
+  function viewChapters() {
+    return [extensionHeader("16章で学ぶ", "目的に合わせて選ぶ学習経路です。STEP 0〜7も引き続き利用できます。"), extensionMenu(),
+      el("div", { class: "extension-grid" }, extension().chapters.map(function (c) {
+        return el("article", { class: "card" }, [el("p", { class: "eyebrow", text: "CHAPTER " + String(c.order).padStart(2, "0") }), el("h2", null, [el("a", { href: "#/chapter/" + c.id, "data-chapter-link": c.id, text: c.title })]), el("p", { text: c.summary }), el("p", { text: readingComplete(c) ? "読了（既存チェック連動）" : "学習中（既存チェック連動）" })]);
+      }))];
+  }
+  function viewChapter(id) {
+    var c = byId(extension().chapters, id);
+    if (!c) return missingPage();
+    var reading = el("p", { class: "reading-state", "data-reading": "", text: readingComplete(c) ? "読了（既存チェック連動）" : "学習中（既存チェック連動）" });
+    var toc = el("details", { class: "extension-toc card" }, [el("summary", { text: "この章の目次" }), el("nav", { class: "extension-links", "aria-label": "この章の目次" }, [ ["learn","学ぶ"],["terms","用語"],["exercise","やってみる"],["request","依頼文"],["checks","チェック"] ].map(function (x) {
+      var a = el("a", { href: "#section-" + x[0], text: x[1] });
+      a.addEventListener("click", function (ev) { ev.preventDefault(); var target = document.getElementById("section-" + x[0]); target.focus(); target.scrollIntoView(); }); return a;
+    }))]);
+    function section(id, title, children) { return el("section", { id: "section-" + id, tabindex: "-1", class: "card" }, [el("h2", { text: title })].concat(children)); }
+    var checkSection = section("checks", "既存チェックと読了", [el("p", { text: "関連する旧教材のチェックをそのまま共有します。すべてのチェックが付くと、この章も読了になります。" }), reading]);
+    c.checkRefs.forEach(function (ref) {
+      var item = ref.kind === "step" ? findStep(ref.id) : findQuickstartStep(ref.id);
+      var checks = ref.kind === "step" ? getChecks(ref.id) : getQuickChecks(ref.id);
+      checkSection.appendChild(el("h3", null, [el("a", { href: ref.kind === "step" ? "#/step/" + ref.id : "#/start", text: item.title })]));
+      var list = el("ul", { class: "checklist extension-checklist" });
+      item.checklist.forEach(function (text, index) {
+        var cid = "ext-" + ref.id + "-" + index;
+        var input = el("input", { type: "checkbox", id: cid, checked: checks[index] === true });
+        input.addEventListener("change", function () {
+          if (ref.kind === "step") setCheck(ref.id, index, input.checked); else setQuickCheck(ref.id, index, input.checked);
+          reading.textContent = readingComplete(c) ? "読了（既存チェック連動）" : "学習中（既存チェック連動）";
+          say(state.storageOk ? "チェックを保存しました。" : "チェックはこの画面内だけで有効です。進捗を保存できませんでした。");
+        });
+        list.appendChild(el("li", null, [input, el("label", { for: cid, text: text })]));
+      });
+      checkSection.appendChild(list);
+    });
+    var prompt = byId(extension().prompts, c.promptId);
+    var body = [extensionHeader(String(c.order).padStart(2, "0") + " " + c.title, c.summary), extensionMenu(), toc,
+      section("learn", "学ぶ", c.learn.map(function (text) { return el("p", { text: text }); }).concat([bookmarkButton("learn/" + id), el("h3", { text: "既存教材を読む" }), relatedStepLinks(c.stepIds)].concat(c.quickIds.length ? [el("a", { href: "#/start", text: "最初の15分の4項目へ" })] : []))),
+      section("terms", "用語", [el("div", { class: "extension-links" }, c.termIds.map(function (id) { var t = byId(extension().terms, id); return el("a", { href: "#/term/" + id, text: state.glossary.items[t.sourceIndex].term }); })), el("a", { href: "#/glossary", text: "用語辞典を開く" })]),
+      section("exercise", "やってみる", [el("p", { text: c.exercise })]),
+      section("request", "コピー可能な依頼文", [el("p", { text: prompt.useCase }), renderPrompt(prompt.text), el("a", { href: "#/prompt/" + prompt.id, text: "この依頼文を保存・詳しく見る" })]), checkSection];
+    if (c.order === 9) body.push(troubleCards());
+    if (c.order === 11 || c.order === 15) body.push(el("section", { class: "card" }, [el("h2", { text: "公式で確かめる" })].concat(extension().officialSources.map(function (src) { return el("p", null, [isAllowedExternal(src.url) ? externalLink(src.title, src.url) : null, el("span", { text: "確認日：" + src.checkedAt + " / " + src.scope })]); }))));
+    if (c.order === 16) body.push(el("p", null, [el("a", { class: "btn", href: "#/glossary", text: "同じ16用語を辞典で読む" })]));
+    body.push(el("details", { class: "card" }, [el("summary", { text: "再利用元と追加した内容" }), el("ul", null, c.sourceRefs.map(function (src) { return el("li", { text: src }); }))]));
+    body.push(el("nav", { class: "pager", "aria-label": "章の移動" }, [c.order > 1 ? el("a", { class: "btn", href: "#/chapter/" + extension().chapters[c.order-2].id, text: "← 前の章" }) : el("a", { href: "#/chapters", text: "16章の一覧へ" }), c.order < 16 ? el("a", { class: "btn primary", href: "#/chapter/" + extension().chapters[c.order].id, text: "次の章 →" }) : el("a", { class: "btn", href: "#/final", text: "最終チェックへ" })]));
+    return [el("div", { class: "extension-page" }, body)];
+  }
+  function viewPrompts(id) {
+    var prompts = id ? extension().prompts.filter(function (p) { return p.id === id; }) : extension().prompts;
+    if (!prompts.length) return missingPage();
+    return [extensionHeader(id ? prompts[0].title : "依頼文ライブラリ", "用途を読んで選び、本文だけをコピーします。実際の対象・条件に合わせてから送ってください。"), extensionMenu(), el("div", { class: "extension-items" }, prompts.map(function (p) {
+      // renderPrompt uses fixed heading IDs for legacy single-prompt pages; rename per card here.
+      var card = renderPrompt(p.text); card.querySelector("h3").id = "prompt-" + p.id; card.setAttribute("aria-labelledby", "prompt-" + p.id);
+      return el("article", { class: "card" }, [el("h2", null, [el("a", { href: "#/prompt/" + p.id, text: p.title })]), el("p", { text: p.useCase }), card, bookmarkButton("prompt/" + p.id), chapterLinks(p.chapterIds), el("p", { class: "meta", text: "再利用元：" + p.sourceRef })]);
+    }))];
+  }
+  function viewTerms(id) {
+    var terms = id ? extension().terms.filter(function (t) { return t.id === id; }) : extension().terms;
+    if (!terms.length) return missingPage();
+    return [extensionHeader(id ? state.glossary.items[terms[0].sourceIndex].term : "用語辞典", "旧教材と同じ16用語を、関連章と一緒に引けます。"), extensionMenu(), el("div", { class: "extension-grid" }, terms.map(function (t) {
+      var src = state.glossary.items[t.sourceIndex];
+      return el("article", { class: "card" }, [el("h2", null, [el("a", { href: "#/term/" + t.id, text: src.term })]), el("p", { text: src.meaning }), bookmarkButton("term/" + t.id), chapterLinks(t.chapterIds), relatedStepLinks(src.stepIds)]);
+    }))];
+  }
+  function troubleCards(id) {
+    return el("section", { class: "extension-items", "aria-label": "困りごと" }, extension().troubles.filter(function (t) { return !id || t.id === id; }).map(function (t) {
+      var src = state.glossary.troubles[t.sourceIndex];
+      return el("article", { class: "card" }, [el("h2", null, [el("a", { href: "#/trouble/" + t.id, text: src.question })]), el("p", { text: src.answer }), bookmarkButton("trouble/" + t.id), chapterLinks(t.chapterIds), relatedStepLinks(src.stepIds)]);
+    }));
+  }
+  function viewQuestions(selected) {
+    var answer = el("section", { class: "card question-answer", "aria-live": "polite" });
+    var buttons = state.questions.map(function (q) {
+      var button = el("button", { class: "btn", type: "button", "data-question": q.id, "aria-pressed": "false", text: q.label });
+      function select() {
+        buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b === button)); });
+        var m = extension().questionMappings.find(function (m) { return m.questionId === q.id; });
+        answer.replaceChildren(el("h2", { text: q.label }), el("p", { text: q.description }), chapterLinks(m ? m.chapterIds : []), el("a", { href: "#/search?q=" + encodeURIComponent(q.query), text: "既存の検索結果も見る" }));
+      }
+      button.addEventListener("click", select);
+      return button;
+    });
+    var match = state.questions.findIndex(function (q) { return q.id === selected; });
+    if (match >= 0) buttons[match].click(); else answer.appendChild(el("p", { text: "質問を選ぶと関連する章がここに表示されます。" }));
+    return [extensionHeader("質問から探す", "4つの疑問から、今読みたい章を選べます。"), extensionMenu(), el("div", { class: "extension-links" }, buttons), answer, troubleCards()];
+  }
+  function viewBookmarks() {
+    return [extensionHeader("保存した教材項目", "依頼文・用語・困りごと・各章の「学ぶ」を保存できます。"), extensionMenu(), bookmarkLoadWarning ? el("p", { class: "note", text: bookmarkLoadWarning }) : null,
+      bookmarkIds.length ? el("div", { class: "extension-grid" }, bookmarkIds.map(function (key) { var info = itemInfo(key); return el("article", { class: "card" }, [el("h2", null, [el("a", { href: info.href, text: info.title })]), bookmarkButton(key)]); })) : el("p", { text: "保存した項目はまだありません。教材の「この項目を保存」から追加できます。" })];
+  }
+  function viewLine(slug) {
+    if (!slug) return [extensionHeader("LINEで受け取る", "最初の一回・安全な頼み方・完成確認の3テーマです。"), extensionMenu(), el("div", { class: "extension-grid" }, extension().lineThemes.map(function (t) { return el("article", { class: "card" }, [el("h2", null, [el("a", { href: "#/line/" + t.slug, text: t.title })]), el("p", { text: t.problem })]); }))];
+    var t = extension().lineThemes.find(function (t) { return t.slug === slug; }); if (!t) return missingPage();
+    var config = state.config.links[t.lineUrl];
+    var link = linkByKey(t.lineUrl);
+    var keyword = el("button", { class: "btn primary", type: "button", "data-keyword-copy": "", text: "「" + t.keyword + "」をコピー" });
+    keyword.addEventListener("click", function () { copyText(t.keyword, keyword); });
+    function list(items) { return el("ol", null, items.map(function (text) { return el("li", { text: text }); })); }
+    return [el("div", { class: "extension-page line-page" }, [
+      extensionHeader(t.title, t.problem), extensionMenu(),
+      el("section", { class: "card", "data-line-section": "cases" }, [el("h2", { text: "こんな3つの場面で" }), el("div", { class: "extension-grid" }, t.useCases.map(function (text) { return el("article", { class: "card line-use-case" }, [el("h3", { text: text })]); }))]),
+      el("section", { class: "card", "data-line-section": "boundary" }, [el("h2", { text: "使い分けの目安" }), el("p", { text: t.boundary })]),
+      el("section", { class: "card", "data-line-section": "receive" }, [el("h2", { text: "LINE受け取り3ステップ" }), el("h3", { text: t.resourceTitle }), el("p", { text: t.resourceDescription }), el("p", { text: "版番号：" + (t.resourceVersion || "未確認") + " / 更新日：" + (t.resourceUpdatedAt || "未確認") }), el("p", { text: "配布物の実体・版情報は確認待ちです。" }), el("p", { class: "meta", text: "参照元：" + t.resourceSource }), list(["公式LINEを開く", "友だち追加する（追加済みならトークを開く）", "キーワード「" + t.keyword + "」を送る"]), el("p", { text: "トークでキーワードを送ると配布物が届きます。" }), link, keyword]),
+      el("section", { class: "card", "data-line-section": "devices" }, [el("h2", { text: "スマホ・PCから受け取る" }), el("div", { class: "extension-grid" }, [el("article", null, [el("h3", { text: "スマホの方" }), list(t.mobileInstructions)]), el("article", null, [el("h3", { text: "PCの方" }), el("img", { class: "line-qr", src: "assets/images/line-qr.png", width: "290", height: "290", alt: "公式LINEをスマホで開くQRコード。下のURLからも開けます。" }), config && config.enabled && isAllowedExternal(config.url) ? el("p", null, [externalLink(config.url, config.url)]) : null, list(t.desktopInstructions)])])]),
+      el("section", { class: "card", "data-line-section": "related" }, [el("h2", { text: "関連する教材へ戻る" }), chapterLinks(t.relatedChapters), relatedStepLinks(t.stepIds), el("p", null, [el("a", { href: "#/start", text: "最初の15分へ" })]), el("img", { class: "extension-tora", src: "assets/images/characters/step-character-07-tora-dialogue.png", alt: "TORAと一緒に教材へ戻ろう", loading: "lazy" })])
+    ])];
+  }
+  function extensionSearch(query) {
+    var lower = query.toLowerCase(), children = [];
+    [["16章", extension().chapters, function(c){return c.title+' '+c.summary+' '+c.learn.join(' ')+' '+c.exercise;}, "chapter"], ["依頼文", extension().prompts, function(p){return p.title+' '+p.useCase+' '+p.text;}, "prompt"]].forEach(function (group) {
+      var hits = group[1].filter(function (x) { return group[2](x).toLowerCase().indexOf(lower) >= 0; });
+      children.push(el("h2", { text: group[0] + "（" + hits.length + "件）" }));
+      children.push(el("div", { class: "search-results", "data-extension-search": group[3] }, hits.map(function (x) { return resultCard(group[0], x.title, x.summary || x.useCase, null, "#/" + group[3] + "/" + x.id); })));
+    });
+    return children;
+  }
+
   /* ---------- ルーター ---------- */
 
   function route() {
@@ -859,7 +1055,24 @@
     var content;
     var focusTitle = true;
     var titleText = "Claude CodeのSTEP";
-    if (path === "/" || path === "") {
+    if (path === "/chapters") {
+      content = viewChapters(); titleText = "16章で学ぶ";
+    } else if (path.indexOf("/chapter/") === 0) {
+      content = viewChapter(path.slice(9)); var chapter = byId(extension().chapters, path.slice(9)); if (chapter) titleText = chapter.title;
+    } else if (path === "/prompts" || path.indexOf("/prompt/") === 0) {
+      content = viewPrompts(path === "/prompts" ? null : path.slice(8)); titleText = "依頼文ライブラリ";
+    } else if (path === "/glossary" || path.indexOf("/term/") === 0) {
+      content = viewTerms(path === "/glossary" ? null : path.slice(6)); titleText = "用語辞典";
+    } else if (path.indexOf("/trouble/") === 0) {
+      var troubleId = path.slice(9);
+      content = byId(extension().troubles, troubleId) ? [extensionHeader("困りごと", "既存教材の回答と関連章"), extensionMenu(), troubleCards(troubleId)] : missingPage(); titleText = "困りごと";
+    } else if (path === "/questions") {
+      content = viewQuestions(query); titleText = "質問から探す";
+    } else if (path === "/bookmarks") {
+      content = viewBookmarks(); titleText = "保存した項目";
+    } else if (path === "/line" || path.indexOf("/line/") === 0) {
+      content = viewLine(path === "/line" ? null : path.slice(6)); titleText = "LINE受け取り";
+    } else if (path === "/" || path === "") {
       content = viewHome();
     } else if (path === "/start") {
       content = viewQuickstart();
@@ -898,6 +1111,7 @@
                    (key === "start" && path === "/start") ||
                    (key === "steps" && (path === "/steps" || path.indexOf("/step/") === 0)) ||
                    (key === "search" && path === "/search") ||
+                   (key === "chapters" && (path === "/chapters" || path.indexOf("/chapter/") === 0)) ||
                    (key === "final" && path === "/final");
       if (active) links[i].setAttribute("aria-current", "page");
       else links[i].removeAttribute("aria-current");
@@ -933,15 +1147,19 @@
 
   function start() {
     bindSkipLink();
-    state.storageOk = loadProgress() && loadQuickstartProgress();
+    var progressOk = loadProgress();
+    var quickOk = loadQuickstartProgress();
+    state.storageOk = progressOk && quickOk;
     if (!state.storageOk && storeNotice) storeNotice.hidden = false;
-    Promise.all([fetchJson("steps.json"), fetchJson("glossary.json"), fetchJson("config.json"), fetchJson("quickstart.json"), fetchJson("questions.json")])
+    Promise.all([fetchJson("steps.json"), fetchJson("glossary.json"), fetchJson("config.json"), fetchJson("quickstart.json"), fetchJson("questions.json"), fetchJson("extension.json")])
       .then(function (res) {
         state.steps = (res[0].steps || []).slice().sort(function (a, b) { return a.order - b.order; });
         state.glossary = res[1];
         state.config = res[2];
         state.quickstart = res[3];
         state.questions = res[4].questions || [];
+        state.extension = res[5];
+        loadBookmarks();
         window.addEventListener("hashchange", route);
         if (!location.hash) location.hash = "#/";
         route();
@@ -953,4 +1171,3 @@
 
   start();
 })();
-

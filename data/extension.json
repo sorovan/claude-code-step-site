@@ -1,0 +1,1253 @@
+{
+  "schemaVersion": 1,
+  "chapters": [
+    {
+      "id": "chapter-01",
+      "order": 1,
+      "title": "最初の15分",
+      "summary": "最初の目標は、今日やること3つのページを1枚作り、自分で開くことです。仕事の資料を使わない空の練習用フォルダから始めます。",
+      "learn": [
+        "最初の目標は、今日やること3つのページを1枚作り、自分で開くことです。仕事の資料を使わない空の練習用フォルダから始めます。",
+        "「最初の15分」の4項目を順に進めます。準備・依頼・確認の本文とチェックは既存教材をそのまま利用します。"
+      ],
+      "exercise": "最初の15分を開き、空フォルダから3項目のページを作って確認する。",
+      "promptId": "first-page",
+      "termIds": [
+        "claude-code",
+        "cli",
+        "install",
+        "folder",
+        "prompt",
+        "done"
+      ],
+      "stepIds": [
+        "step-0",
+        "step-1",
+        "step-2"
+      ],
+      "quickIds": [
+        "quickstart-folder",
+        "quickstart-location",
+        "quickstart-prompt",
+        "quickstart-verify"
+      ],
+      "sourceRefs": [
+        "data/steps.json#step-0 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-1 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-2 (既存本文・指示文・チェックを参照)",
+        "data/quickstart.json（既存4項目を再利用）",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "quick",
+          "id": "quickstart-folder"
+        },
+        {
+          "kind": "quick",
+          "id": "quickstart-location"
+        },
+        {
+          "kind": "quick",
+          "id": "quickstart-prompt"
+        },
+        {
+          "kind": "quick",
+          "id": "quickstart-verify"
+        }
+      ]
+    },
+    {
+      "id": "chapter-02",
+      "order": 2,
+      "title": "画面の見方",
+      "summary": "作業を送る前に、選んでいる作業フォルダと入力欄を確かめます。画面名だけで判断せず、どこにファイルができるかを確認します。",
+      "learn": [
+        "作業を送る前に、選んでいる作業フォルダと入力欄を確かめます。画面名だけで判断せず、どこにファイルができるかを確認します。",
+        "既存のSTEP 1と実践コースの画面案内を読みます。表示位置や選択肢は更新や利用環境で変わるため、見当たらないときは公式案内と自分の画面を照合します。"
+      ],
+      "exercise": "現在の作業フォルダと入力欄を見つけ、保存先をメモする。",
+      "promptId": "step-1",
+      "termIds": [
+        "cli",
+        "install"
+      ],
+      "stepIds": [
+        "step-1"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-1 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-1"
+        }
+      ]
+    },
+    {
+      "id": "chapter-03",
+      "order": 3,
+      "title": "フォルダと資料",
+      "summary": "フォルダは今回触ってよい範囲を決める入れ物です。練習はpractice-claudeだけに限定し、元の仕事資料は入れません。",
+      "learn": [
+        "フォルダは今回触ってよい範囲を決める入れ物です。練習はpractice-claudeだけに限定し、元の仕事資料は入れません。",
+        "既存のファイルを扱うときは先にコピーを残します。資料を渡すなら必要な部分だけにし、パスワードや個人情報を含めないでください。"
+      ],
+      "exercise": "練習用ファイルのコピーを残し、触ってよいファイル名を1つ書く。",
+      "promptId": "step-3",
+      "termIds": [
+        "folder",
+        "backup",
+        "overwrite"
+      ],
+      "stepIds": [
+        "step-3"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-3 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-3"
+        }
+      ]
+    },
+    {
+      "id": "chapter-04",
+      "order": 4,
+      "title": "頼み方",
+      "summary": "目的だけでなく、対象ファイル・変更禁止・完了条件をセットで伝えます。何を作るかと、何を変えないかを分けて書きます。",
+      "learn": [
+        "目的だけでなく、対象ファイル・変更禁止・完了条件をセットで伝えます。何を作るかと、何を変えないかを分けて書きます。",
+        "まずSTEP 2の小さな会話を試し、次にSTEP 4の指示文を使います。依頼文ライブラリの説明は選ぶための情報で、コピーする本文とは分かれています。"
+      ],
+      "exercise": "目的・対象・変更禁止・完了条件の4行を書き、STEP 4の依頼文と比べる。",
+      "promptId": "step-4",
+      "termIds": [
+        "prompt",
+        "done",
+        "scope"
+      ],
+      "stepIds": [
+        "step-2",
+        "step-4"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-2 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-4 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-2"
+        },
+        {
+          "kind": "step",
+          "id": "step-4"
+        }
+      ]
+    },
+    {
+      "id": "chapter-05",
+      "order": 5,
+      "title": "完成物の確かめ方",
+      "summary": "AIの完了報告を読んだら、保存場所を確認して実物を開きます。表示できることと、操作できることを別々に確かめます。",
+      "learn": [
+        "AIの完了報告を読んだら、保存場所を確認して実物を開きます。表示できることと、操作できることを別々に確かめます。",
+        "変更前後の違い、試した操作、その結果、未確認の項目を残します。動かない場合は追加の変更を重ねる前に症状を具体的に伝えます。"
+      ],
+      "exercise": "index.htmlを開き、チェックを付け外しし、確認済みと未確認をメモする。",
+      "promptId": "step-5",
+      "termIds": [
+        "diff",
+        "test",
+        "unverified"
+      ],
+      "stepIds": [
+        "step-5"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-5 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-5"
+        }
+      ]
+    },
+    {
+      "id": "chapter-06",
+      "order": 6,
+      "title": "続きから使う",
+      "summary": "続ける前に前回の保存場所と確認結果を読み返します。同じフォルダを選び、未確認だった項目を1つ決めて再開します。",
+      "learn": [
+        "続ける前に前回の保存場所と確認結果を読み返します。同じフォルダを選び、未確認だった項目を1つ決めて再開します。",
+        "この教材のチェックは同じブラウザに保存されます。保存できない環境では画面内の案内を確認し、再開位置を自分でもメモします。ブックマークは教材を探し直すために使えます。"
+      ],
+      "exercise": "前回の保存先を開き、次に確かめる項目を1つ選ぶ。",
+      "promptId": "restart",
+      "termIds": [
+        "folder",
+        "done",
+        "unverified"
+      ],
+      "stepIds": [
+        "step-7"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-7 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-7"
+        }
+      ]
+    },
+    {
+      "id": "chapter-07",
+      "order": 7,
+      "title": "毎回の約束",
+      "summary": "毎回、作業場所・変更範囲・秘密情報・確認方法を見直します。以前に安全だった依頼でも、今回のファイルに合っているかを確認します。",
+      "learn": [
+        "毎回、作業場所・変更範囲・秘密情報・確認方法を見直します。以前に安全だった依頼でも、今回のファイルに合っているかを確認します。",
+        "STEP 3・4・6のチェックを共通の約束として使います。公開や共有は、内容と履歴に秘密情報がないことを確認してから判断します。"
+      ],
+      "exercise": "作業前に範囲・バックアップ・秘密情報・完了条件を声に出して確認する。",
+      "promptId": "step-4",
+      "termIds": [
+        "folder",
+        "prompt",
+        "done",
+        "backup",
+        "overwrite",
+        "scope",
+        "github",
+        "repository",
+        "commit",
+        "secret"
+      ],
+      "stepIds": [
+        "step-3",
+        "step-4",
+        "step-6"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-3 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-4 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-6 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-3"
+        },
+        {
+          "kind": "step",
+          "id": "step-4"
+        },
+        {
+          "kind": "step",
+          "id": "step-6"
+        }
+      ]
+    },
+    {
+      "id": "chapter-08",
+      "order": 8,
+      "title": "便利な機能",
+      "summary": "この教材の検索は言葉や困りごとから探す入口、目次は今のページ内を移動する入口です。コピーは依頼文の本文だけを取り出します。",
+      "learn": [
+        "この教材の検索は言葉や困りごとから探す入口、目次は今のページ内を移動する入口です。コピーは依頼文の本文だけを取り出します。",
+        "文字が小さいときは上部の文字サイズを変更します。キーボードではTabでボタンやリンクへ進み、Enterで選べます。TORAの案内もトップで利用できます。"
+      ],
+      "exercise": "検索で「差分」を探し、依頼文をコピーし、文字サイズを変えてみる。",
+      "promptId": "step-2",
+      "termIds": [
+        "prompt",
+        "done",
+        "diff",
+        "test",
+        "unverified"
+      ],
+      "stepIds": [
+        "step-2",
+        "step-5"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-2 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-5 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-2"
+        },
+        {
+          "kind": "step",
+          "id": "step-5"
+        }
+      ]
+    },
+    {
+      "id": "chapter-09",
+      "order": 9,
+      "title": "困ったとき",
+      "summary": "困ったときは、期待した結果・実際の結果・表示された文言を分けてメモします。秘密の値を貼らず、問題が出た範囲だけを伝えます。",
+      "learn": [
+        "困ったときは、期待した結果・実際の結果・表示された文言を分けてメモします。秘密の値を貼らず、問題が出た範囲だけを伝えます。",
+        "既存の4つの困りごとから回答と関連章を選べます。何度も変更を頼む前に、対象とバックアップ、まだ試していない確認を見直します。"
+      ],
+      "exercise": "自分の症状に近い困りごとを選び、関連章と旧STEPを開く。",
+      "promptId": "repair",
+      "termIds": [
+        "cli",
+        "install",
+        "folder",
+        "prompt",
+        "done",
+        "backup",
+        "overwrite",
+        "scope",
+        "diff",
+        "test",
+        "unverified",
+        "github",
+        "repository",
+        "commit",
+        "secret"
+      ],
+      "stepIds": [
+        "step-1",
+        "step-3",
+        "step-4",
+        "step-5",
+        "step-6"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-1 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-3 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-4 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-5 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-6 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-1"
+        },
+        {
+          "kind": "step",
+          "id": "step-3"
+        },
+        {
+          "kind": "step",
+          "id": "step-4"
+        },
+        {
+          "kind": "step",
+          "id": "step-5"
+        },
+        {
+          "kind": "step",
+          "id": "step-6"
+        }
+      ]
+    },
+    {
+      "id": "chapter-10",
+      "order": 10,
+      "title": "仕事別の練習",
+      "summary": "仕事に似た題材も架空の内容で練習します。メール担当なら「返す・読む・確認する」、事務担当なら「整理・点検・記録」の3項目を使えます。",
+      "learn": [
+        "仕事に似た題材も架空の内容で練習します。メール担当なら「返す・読む・確認する」、事務担当なら「整理・点検・記録」の3項目を使えます。",
+        "操作は最初の15分と同じです。空フォルダにindex.htmlを1枚作り、ブラウザで開き、チェックを付け外しします。本番の顧客資料や外部連携は扱いません。"
+      ],
+      "exercise": "架空の事務作業3つを題材にindex.htmlを依頼し、3つのチェックを試す。",
+      "promptId": "work",
+      "termIds": [
+        "prompt",
+        "done",
+        "scope",
+        "diff",
+        "test",
+        "unverified"
+      ],
+      "stepIds": [
+        "step-2",
+        "step-4",
+        "step-5"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-2 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-4 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-5 (既存本文・指示文・チェックを参照)",
+        "data/quickstart.json（既存4項目を再利用）",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-2"
+        },
+        {
+          "kind": "step",
+          "id": "step-4"
+        },
+        {
+          "kind": "step",
+          "id": "step-5"
+        }
+      ]
+    },
+    {
+      "id": "chapter-11",
+      "order": 11,
+      "title": "モードとモデル",
+      "summary": "モードは作業の進め方や許可の扱い、モデルは回答を作るAIの選択です。名前が似ていても、何を選ぶ設定なのかを分けて確認します。",
+      "learn": [
+        "モードは作業の進め方や許可の扱い、モデルは回答を作るAIの選択です。名前が似ていても、何を選ぶ設定なのかを分けて確認します。",
+        "選べる項目は環境・契約・管理設定で異なります。ここでは特定の最新版・料金・性能順位を断定しません。設定を変える前に公式の画面案内とモデル設定を読み、自分の画面の表示をメモします。"
+      ],
+      "exercise": "公式リンクと自分の設定画面を見比べ、現在の表示と未確認点を記録する。",
+      "promptId": "step-0",
+      "termIds": [
+        "claude-code",
+        "cli",
+        "install",
+        "folder"
+      ],
+      "stepIds": [
+        "step-0",
+        "step-1"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-0 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-1 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-0"
+        },
+        {
+          "kind": "step",
+          "id": "step-1"
+        }
+      ]
+    },
+    {
+      "id": "chapter-12",
+      "order": 12,
+      "title": "アプリを作る",
+      "summary": "最初のアプリは、3項目を表示してチェックを付け外しできる1枚のページにします。使う人と完成条件を短く決めてから依頼します。",
+      "learn": [
+        "最初のアプリは、3項目を表示してチェックを付け外しできる1枚のページにします。使う人と完成条件を短く決めてから依頼します。",
+        "新しいツールの導入や公開はせず、既存STEPのフォルダ選択・依頼文コピー・HTML作成・ブラウザ確認だけで試します。まず小さな成果物を確かめてから次の変更を考えます。"
+      ],
+      "exercise": "最初の15分の指示文で1枚のページを作り、完成条件を自分で確認する。",
+      "promptId": "first-page",
+      "termIds": [
+        "prompt",
+        "done",
+        "scope"
+      ],
+      "stepIds": [
+        "step-2",
+        "step-4"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-2 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-4 (既存本文・指示文・チェックを参照)",
+        "data/quickstart.json（既存4項目を再利用）",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-2"
+        },
+        {
+          "kind": "step",
+          "id": "step-4"
+        }
+      ]
+    },
+    {
+      "id": "chapter-13",
+      "order": 13,
+      "title": "コードを直す",
+      "summary": "修正は、うまくいかない操作を1つ選び、期待と実際を伝えます。対象は練習中のindex.htmlだけに限定します。",
+      "learn": [
+        "修正は、うまくいかない操作を1つ選び、期待と実際を伝えます。対象は練習中のindex.htmlだけに限定します。",
+        "先に変更前のコピーを残し、修正後は同じ操作を繰り返して確認します。直った箇所と未確認を分け、他のファイルまで変わっていないか差分を確認します。"
+      ],
+      "exercise": "チェックが動かない場合を想定し、index.htmlだけを対象とする修正依頼を書く。",
+      "promptId": "repair",
+      "termIds": [
+        "prompt",
+        "done",
+        "scope",
+        "diff",
+        "test",
+        "unverified"
+      ],
+      "stepIds": [
+        "step-4",
+        "step-5"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-4 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-5 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-4"
+        },
+        {
+          "kind": "step",
+          "id": "step-5"
+        }
+      ]
+    },
+    {
+      "id": "chapter-14",
+      "order": 14,
+      "title": "動きのある作品",
+      "summary": "「動き」は最初の15分で扱ったチェックの付け外しを使います。たとえば終わった項目を選び、もう一度外して元の表示に戻る作品です。",
+      "learn": [
+        "「動き」は最初の15分で扱ったチェックの付け外しを使います。たとえば終わった項目を選び、もう一度外して元の表示に戻る作品です。",
+        "新しいアニメーション環境や外部ライブラリは追加しません。既存のHTMLページを依頼してブラウザで確認する手順のまま、操作前と操作後を比べます。"
+      ],
+      "exercise": "チェックを付ける→外す操作を3回行い、表示と操作結果を記録する。",
+      "promptId": "interactive",
+      "termIds": [
+        "diff",
+        "test",
+        "unverified"
+      ],
+      "stepIds": [
+        "step-5",
+        "step-7"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-5 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-7 (既存本文・指示文・チェックを参照)",
+        "data/quickstart.json（既存4項目を再利用）",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-5"
+        },
+        {
+          "kind": "step",
+          "id": "step-7"
+        }
+      ]
+    },
+    {
+      "id": "chapter-15",
+      "order": 15,
+      "title": "公式で確かめる",
+      "summary": "教材と画面の表示が違うときは、公式ページの対象製品・利用環境・記載内容を確かめます。公式の説明と自分の画面を並べて確認します。",
+      "learn": [
+        "教材と画面の表示が違うときは、公式ページの対象製品・利用環境・記載内容を確かめます。公式の説明と自分の画面を並べて確認します。",
+        "公式ページへのリンクを確認した日と、確かめた項目をメモします。リンクを開いただけで全仕様を確認したことにはなりません。不明な料金・モデル・配布条件は未確認として残します。"
+      ],
+      "exercise": "公式の画面案内とモデル設定を開き、対象環境・確認日・不明点をメモする。",
+      "promptId": "step-1",
+      "termIds": [
+        "cli",
+        "install",
+        "github",
+        "repository",
+        "commit",
+        "secret"
+      ],
+      "stepIds": [
+        "step-1",
+        "step-6"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-1 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-6 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-1"
+        },
+        {
+          "kind": "step",
+          "id": "step-6"
+        }
+      ]
+    },
+    {
+      "id": "chapter-16",
+      "order": 16,
+      "title": "用語辞典",
+      "summary": "用語は暗記するより、作業中に出てきた言葉をその都度引きます。意味を読んだら、関連する旧STEPと章で実際の使い方を確かめます。",
+      "learn": [
+        "用語は暗記するより、作業中に出てきた言葉をその都度引きます。意味を読んだら、関連する旧STEPと章で実際の使い方を確かめます。",
+        "独立した用語辞典とこの章は同じ既存16用語を参照します。保存したい用語は項目ごとのブックマークで残せます。"
+      ],
+      "exercise": "「差分」「完了条件」「未検証」を引き、それぞれを自分の確認メモで使う。",
+      "promptId": "step-2",
+      "termIds": [
+        "claude-code",
+        "cli",
+        "install",
+        "folder",
+        "prompt",
+        "done",
+        "backup",
+        "overwrite",
+        "scope",
+        "diff",
+        "test",
+        "unverified",
+        "github",
+        "repository",
+        "commit",
+        "secret"
+      ],
+      "stepIds": [
+        "step-0",
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4",
+        "step-5",
+        "step-6",
+        "step-7"
+      ],
+      "quickIds": [],
+      "sourceRefs": [
+        "data/steps.json#step-0 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-1 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-2 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-3 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-4 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-5 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-6 (既存本文・指示文・チェックを参照)",
+        "data/steps.json#step-7 (既存本文・指示文・チェックを参照)",
+        "追加：この章の学ぶ・演習・関連付け"
+      ],
+      "checkRefs": [
+        {
+          "kind": "step",
+          "id": "step-0"
+        },
+        {
+          "kind": "step",
+          "id": "step-1"
+        },
+        {
+          "kind": "step",
+          "id": "step-2"
+        },
+        {
+          "kind": "step",
+          "id": "step-3"
+        },
+        {
+          "kind": "step",
+          "id": "step-4"
+        },
+        {
+          "kind": "step",
+          "id": "step-5"
+        },
+        {
+          "kind": "step",
+          "id": "step-6"
+        },
+        {
+          "kind": "step",
+          "id": "step-7"
+        }
+      ]
+    }
+  ],
+  "prompts": [
+    {
+      "id": "first-page",
+      "title": "最初のページを作る",
+      "useCase": "空の練習用フォルダで最初に試すとき",
+      "text": "Claude Codeの最初の練習です。今選んでいるpractice-claudeフォルダに、今日やること3つのページをindex.htmlとして作ってください。項目は「メールを1通返す」「資料を10分読む」「明日の予定を確認する」にしてください。終わった項目にチェックを付け外しできるようにし、白い背景に読みやすい見出しを使ってください。作業後に保存場所と確認方法を教えてください。公開はまだしないでください。",
+      "chapterIds": [
+        "chapter-01",
+        "chapter-12"
+      ],
+      "sourceRef": "data/quickstart.json#quickstart-prompt.prompt"
+    },
+    {
+      "id": "step-0",
+      "title": "できることを整理する",
+      "useCase": "最初に小さな目標を決めるとき",
+      "text": "Claude Codeの練習を始めます。practice-claudeに1枚のHTMLページを作る前に、できることと私が確認することを短く整理してください。まだファイルは変更せず、公開もしないでください。",
+      "chapterIds": [
+        "chapter-01",
+        "chapter-11",
+        "chapter-16"
+      ],
+      "sourceRef": "新規補足：STEP 0の導入"
+    },
+    {
+      "id": "step-1",
+      "title": "画面と作業場所を確認する",
+      "useCase": "作業を送る前に対象を確認するとき",
+      "text": "練習を始める前に、選択中の作業フォルダと保存先の確認方法を教えてください。私の画面が分からない場合は推測せず、確認に必要な表示を教えてください。まだファイルを変更せず、公開もしないでください。",
+      "chapterIds": [
+        "chapter-01",
+        "chapter-02",
+        "chapter-09",
+        "chapter-11",
+        "chapter-15",
+        "chapter-16"
+      ],
+      "sourceRef": "新規補足：STEP 1とquickstart-location"
+    },
+    {
+      "id": "step-2",
+      "title": "最初の会話の依頼文",
+      "useCase": "作りたいものを1文で伝え、AIの返答の読み方を覚えます。",
+      "text": "このフォルダで、1ページだけの自己紹介HTMLを作りたいです。まず作業計画を3つに分けて示してください。ファイルはまだ作らず、作る前に確認を取ってください。",
+      "chapterIds": [
+        "chapter-01",
+        "chapter-04",
+        "chapter-08",
+        "chapter-10",
+        "chapter-12",
+        "chapter-16"
+      ],
+      "sourceRef": "data/steps.json#step-2.prompt"
+    },
+    {
+      "id": "step-3",
+      "title": "作業場所とバックアップの依頼文",
+      "useCase": "作業フォルダを分け、既存ファイルを守るためのバックアップを作ります。",
+      "text": "作業対象は practice-claude フォルダの中だけにしてください。それ以外のフォルダやファイルは読み取りも変更もしないでください。",
+      "chapterIds": [
+        "chapter-03",
+        "chapter-07",
+        "chapter-09",
+        "chapter-16"
+      ],
+      "sourceRef": "data/steps.json#step-3.prompt"
+    },
+    {
+      "id": "step-4",
+      "title": "安全な指示の書き方の依頼文",
+      "useCase": "目的・対象・変更禁止・完了条件を指示に入れる書き方を学びます。",
+      "text": "目的：index.html の見出し文を「はじめての作品」に変えたい。\n対象：index.html の h1 タグのみ。\n変更禁止：CSSファイル、他のHTMLファイル、フォルダ構成。\n完了条件：h1 の文字が変わっていること。\n報告：変更したファイル名・変更箇所・確認方法・未確認の点を教えてください。",
+      "chapterIds": [
+        "chapter-04",
+        "chapter-07",
+        "chapter-09",
+        "chapter-10",
+        "chapter-12",
+        "chapter-13",
+        "chapter-16"
+      ],
+      "sourceRef": "data/steps.json#step-4.prompt"
+    },
+    {
+      "id": "step-5",
+      "title": "結果確認とテストの依頼文",
+      "useCase": "AIの「できた」を鵜呑みにせず、差分とテストで確かめる習慣を付けます。",
+      "text": "今回の変更について、(1)変更したファイルと行、(2)変更前後の内容、(3)実際に確認した方法、(4)まだ確認していないこと、を分けて報告してください。確認していないことを「完了」と書かないでください。",
+      "chapterIds": [
+        "chapter-05",
+        "chapter-08",
+        "chapter-09",
+        "chapter-10",
+        "chapter-13",
+        "chapter-14",
+        "chapter-16"
+      ],
+      "sourceRef": "data/steps.json#step-5.prompt"
+    },
+    {
+      "id": "step-6",
+      "title": "GitHubへの入口の依頼文",
+      "useCase": "変更の履歴を残す仕組み（GitHub）の基本と、秘密情報を入れない注意点を学びます。",
+      "text": "このフォルダの変更を確認し、コミットしてよい内容かを示してください。秘密情報（パスワード・APIキー・トークン・個人情報）が含まれていないかを先に確認し、含まれていれば値は表示せずファイル名だけ報告してください。コミットは私の承認後に行ってください。",
+      "chapterIds": [
+        "chapter-07",
+        "chapter-09",
+        "chapter-15",
+        "chapter-16"
+      ],
+      "sourceRef": "data/steps.json#step-6.prompt"
+    },
+    {
+      "id": "restart",
+      "title": "続きから再開",
+      "useCase": "前回の確認結果から再開するとき",
+      "text": "今選んでいるpractice-claudeフォルダで、前回のindex.htmlを確認してください。まだ変更せず、現在の状態と次に確認することを教えてください。公開しないでください。",
+      "chapterIds": [
+        "chapter-06"
+      ],
+      "sourceRef": "新規補足：STEP 7の振り返り"
+    },
+    {
+      "id": "work",
+      "title": "架空の仕事で練習",
+      "useCase": "仕事に似た題材を安全に試すとき",
+      "text": "practice-claude内のindex.htmlに、架空の事務作業「資料を整理する」「数字を点検する」「結果を記録する」の3項目を表示してください。チェックを付け外しできるようにしてください。他のファイルは変更せず、保存場所と確認方法を報告してください。公開しないでください。",
+      "chapterIds": [
+        "chapter-10",
+        "chapter-12"
+      ],
+      "sourceRef": "新規演習：quickstart-promptの題材差替え"
+    },
+    {
+      "id": "repair",
+      "title": "不具合を1つ直す",
+      "useCase": "表示と操作結果が違うとき",
+      "text": "practice-claudeのindex.htmlで、3項目は見えますがチェックを押しても変わりません。まず原因を確認し、index.htmlだけを最小限修正してください。他のファイルは変更しないでください。変更内容・試した操作・未確認を報告してください。公開しないでください。",
+      "chapterIds": [
+        "chapter-09",
+        "chapter-13"
+      ],
+      "sourceRef": "新規補足：quickstart-verifyの症状例とSTEP 4・5"
+    },
+    {
+      "id": "interactive",
+      "title": "チェックの動きを確かめる",
+      "useCase": "操作前後を比べるとき",
+      "text": "practice-claudeのindex.htmlについて、3項目のチェックを付け外しできるか確認してください。変更が必要ならこのファイルだけを対象にし、他の機能は変えないでください。確認した操作と未確認を分けて教えてください。公開しないでください。",
+      "chapterIds": [
+        "chapter-14"
+      ],
+      "sourceRef": "新規演習：quickstartのチェック操作"
+    }
+  ],
+  "terms": [
+    {
+      "id": "claude-code",
+      "sourceIndex": 0,
+      "chapterIds": [
+        "chapter-01",
+        "chapter-11",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "cli",
+      "sourceIndex": 1,
+      "chapterIds": [
+        "chapter-01",
+        "chapter-02",
+        "chapter-09",
+        "chapter-11",
+        "chapter-15",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "install",
+      "sourceIndex": 2,
+      "chapterIds": [
+        "chapter-01",
+        "chapter-02",
+        "chapter-09",
+        "chapter-11",
+        "chapter-15",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "folder",
+      "sourceIndex": 3,
+      "chapterIds": [
+        "chapter-01",
+        "chapter-03",
+        "chapter-07",
+        "chapter-09",
+        "chapter-11",
+        "chapter-16",
+        "chapter-06"
+      ]
+    },
+    {
+      "id": "prompt",
+      "sourceIndex": 4,
+      "chapterIds": [
+        "chapter-01",
+        "chapter-04",
+        "chapter-07",
+        "chapter-08",
+        "chapter-09",
+        "chapter-10",
+        "chapter-12",
+        "chapter-13",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "done",
+      "sourceIndex": 5,
+      "chapterIds": [
+        "chapter-01",
+        "chapter-04",
+        "chapter-07",
+        "chapter-08",
+        "chapter-09",
+        "chapter-10",
+        "chapter-12",
+        "chapter-13",
+        "chapter-16",
+        "chapter-06"
+      ]
+    },
+    {
+      "id": "backup",
+      "sourceIndex": 6,
+      "chapterIds": [
+        "chapter-03",
+        "chapter-07",
+        "chapter-09",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "overwrite",
+      "sourceIndex": 7,
+      "chapterIds": [
+        "chapter-03",
+        "chapter-07",
+        "chapter-09",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "scope",
+      "sourceIndex": 8,
+      "chapterIds": [
+        "chapter-04",
+        "chapter-07",
+        "chapter-09",
+        "chapter-10",
+        "chapter-12",
+        "chapter-13",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "diff",
+      "sourceIndex": 9,
+      "chapterIds": [
+        "chapter-05",
+        "chapter-08",
+        "chapter-09",
+        "chapter-10",
+        "chapter-13",
+        "chapter-14",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "test",
+      "sourceIndex": 10,
+      "chapterIds": [
+        "chapter-05",
+        "chapter-08",
+        "chapter-09",
+        "chapter-10",
+        "chapter-13",
+        "chapter-14",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "unverified",
+      "sourceIndex": 11,
+      "chapterIds": [
+        "chapter-05",
+        "chapter-08",
+        "chapter-09",
+        "chapter-10",
+        "chapter-13",
+        "chapter-14",
+        "chapter-16",
+        "chapter-06"
+      ]
+    },
+    {
+      "id": "github",
+      "sourceIndex": 12,
+      "chapterIds": [
+        "chapter-07",
+        "chapter-09",
+        "chapter-15",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "repository",
+      "sourceIndex": 13,
+      "chapterIds": [
+        "chapter-07",
+        "chapter-09",
+        "chapter-15",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "commit",
+      "sourceIndex": 14,
+      "chapterIds": [
+        "chapter-07",
+        "chapter-09",
+        "chapter-15",
+        "chapter-16"
+      ]
+    },
+    {
+      "id": "secret",
+      "sourceIndex": 15,
+      "chapterIds": [
+        "chapter-07",
+        "chapter-09",
+        "chapter-15",
+        "chapter-16"
+      ]
+    }
+  ],
+  "troubles": [
+    {
+      "id": "install",
+      "sourceIndex": 0,
+      "chapterIds": [
+        "chapter-02",
+        "chapter-09",
+        "chapter-15"
+      ]
+    },
+    {
+      "id": "wrong-file",
+      "sourceIndex": 1,
+      "chapterIds": [
+        "chapter-03",
+        "chapter-04",
+        "chapter-09",
+        "chapter-13"
+      ]
+    },
+    {
+      "id": "not-working",
+      "sourceIndex": 2,
+      "chapterIds": [
+        "chapter-05",
+        "chapter-09",
+        "chapter-13"
+      ]
+    },
+    {
+      "id": "secret",
+      "sourceIndex": 3,
+      "chapterIds": [
+        "chapter-07",
+        "chapter-09",
+        "chapter-15"
+      ]
+    }
+  ],
+  "questionMappings": [
+    {
+      "questionId": "start",
+      "chapterIds": [
+        "chapter-01",
+        "chapter-03"
+      ]
+    },
+    {
+      "questionId": "screen",
+      "chapterIds": [
+        "chapter-02",
+        "chapter-11"
+      ]
+    },
+    {
+      "questionId": "prompt",
+      "chapterIds": [
+        "chapter-04",
+        "chapter-07",
+        "chapter-13"
+      ]
+    },
+    {
+      "questionId": "trouble",
+      "chapterIds": [
+        "chapter-09",
+        "chapter-05",
+        "chapter-15"
+      ]
+    }
+  ],
+  "lineThemes": [
+    {
+      "id": "first",
+      "slug": "first",
+      "title": "最初の一回",
+      "problem": "最初に何を頼めばいい？",
+      "useCases": [
+        "空の練習用フォルダで試す",
+        "1ページだけ作ってみる",
+        "保存場所とチェックの動きを確認する"
+      ],
+      "boundary": "小さなページを最初に試すときに使います。すでに作れているなら、完成確認のテーマへ進めます。",
+      "resourceTitle": "最初の一回の指示文・確認チェック",
+      "resourceDescription": "既存教材の指示文とチェックリストを固定版で受け取るための案内です。配布実体との一致は公開前に確認します。",
+      "resourceVersion": null,
+      "resourceUpdatedAt": null,
+      "resourceSource": "data/quickstart.json#quickstart-prompt.prompt + quickstart-verify.checklist",
+      "keyword": "はじめて",
+      "lineUrl": "officialLine",
+      "relatedChapters": [
+        "chapter-01",
+        "chapter-02",
+        "chapter-04",
+        "chapter-05"
+      ],
+      "stepIds": [
+        "step-0",
+        "step-1",
+        "step-2"
+      ],
+      "mobileInstructions": [
+        "公式LINEへのリンクを押すと、LINEアプリまたは案内画面に移ります。",
+        "友だち追加後、トークにキーワードをそのまま送ります。",
+        "この教材へはブラウザのタブへ戻ります。あとで読み返すならブラウザでこのページをブックマークしてください。"
+      ],
+      "desktopInstructions": [
+        "スマホのカメラでQRコードを読むか、表示の公式URLをスマホで開きます。",
+        "公式LINEを開き、友だち追加します。",
+        "トークでキーワードを送ります。パソコンのこのタブを残すと教材へ戻れます。"
+      ]
+    },
+    {
+      "id": "safe",
+      "slug": "safe",
+      "title": "安全な頼み方",
+      "problem": "AIに、どこまで頼んでよい？",
+      "useCases": [
+        "変更するファイルを限定する",
+        "変えてほしくない範囲を伝える",
+        "完了時に報告してほしいことを決める"
+      ],
+      "boundary": "既存のファイルを扱う前に使います。何も変更しない用語の確認だけなら、作業依頼の全文は不要です。",
+      "resourceTitle": "安全な頼み方の指示文・確認チェック",
+      "resourceDescription": "既存教材の指示文とチェックリストを固定版で受け取るための案内です。配布実体との一致は公開前に確認します。",
+      "resourceVersion": null,
+      "resourceUpdatedAt": null,
+      "resourceSource": "data/steps.json#step-4.prompt + checklist",
+      "keyword": "あんぜん",
+      "lineUrl": "officialLine",
+      "relatedChapters": [
+        "chapter-04",
+        "chapter-07",
+        "chapter-13"
+      ],
+      "stepIds": [
+        "step-3",
+        "step-4"
+      ],
+      "mobileInstructions": [
+        "公式LINEへのリンクを押すと、LINEアプリまたは案内画面に移ります。",
+        "友だち追加後、トークにキーワードをそのまま送ります。",
+        "この教材へはブラウザのタブへ戻ります。あとで読み返すならブラウザでこのページをブックマークしてください。"
+      ],
+      "desktopInstructions": [
+        "スマホのカメラでQRコードを読むか、表示の公式URLをスマホで開きます。",
+        "公式LINEを開き、友だち追加します。",
+        "トークでキーワードを送ります。パソコンのこのタブを残すと教材へ戻れます。"
+      ]
+    },
+    {
+      "id": "verify",
+      "slug": "verify",
+      "title": "完成確認",
+      "problem": "できたと言われた後、何を見る？",
+      "useCases": [
+        "変更前後の違いを見る",
+        "完成したページを自分で開く",
+        "確認済みと未確認を分ける"
+      ],
+      "boundary": "成果物ができた後に使います。まだ何も作っていない場合は、最初の一回から始めます。",
+      "resourceTitle": "完成確認の指示文・確認チェック",
+      "resourceDescription": "既存教材の指示文とチェックリストを固定版で受け取るための案内です。配布実体との一致は公開前に確認します。",
+      "resourceVersion": null,
+      "resourceUpdatedAt": null,
+      "resourceSource": "data/steps.json#step-5.prompt + checklist",
+      "keyword": "かくにん",
+      "lineUrl": "officialLine",
+      "relatedChapters": [
+        "chapter-05",
+        "chapter-09",
+        "chapter-15"
+      ],
+      "stepIds": [
+        "step-5"
+      ],
+      "mobileInstructions": [
+        "公式LINEへのリンクを押すと、LINEアプリまたは案内画面に移ります。",
+        "友だち追加後、トークにキーワードをそのまま送ります。",
+        "この教材へはブラウザのタブへ戻ります。あとで読み返すならブラウザでこのページをブックマークしてください。"
+      ],
+      "desktopInstructions": [
+        "スマホのカメラでQRコードを読むか、表示の公式URLをスマホで開きます。",
+        "公式LINEを開き、友だち追加します。",
+        "トークでキーワードを送ります。パソコンのこのタブを残すと教材へ戻れます。"
+      ]
+    }
+  ],
+  "officialSources": [
+    {
+      "title": "公式：デスクトップ画面の案内",
+      "url": "https://code.claude.com/docs/en/desktop",
+      "checkedAt": "2026-11-09",
+      "scope": "画面・許可の案内ページを確認。全環境の表示一致は未確認。"
+    },
+    {
+      "title": "公式：モデル設定",
+      "url": "https://code.claude.com/docs/en/model-config",
+      "checkedAt": "2026-11-09",
+      "scope": "設定の公式参照先を確認。個別モデルの最新仕様・料金・提供可否は断定しない。"
+    }
+  ]
+}
