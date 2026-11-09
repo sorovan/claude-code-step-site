@@ -706,7 +706,10 @@
     if (step.nextText) children.push(el("p", { class: "next-text", text: "次へ進む：" + step.nextText }));
     children.push(nav);
     children.push(el("p", { class: "meta", text: "教材の更新日：" + step.updatedAt }));
-    return [el("div", { class: "lesson-page" }, [
+    return [el("div", {
+      class: "lesson-page step-accent-" + String(step.order),
+      "data-step-order": String(step.order)
+    }, [
       el("div", { class: "lesson-layout" }, [stepRail(step), el("div", { class: "lesson-content" }, children)])
     ])];
   }
