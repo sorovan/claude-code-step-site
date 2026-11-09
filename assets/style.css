@@ -696,3 +696,52 @@ pre.prompt {
   .quickstart-achievement img { width: 72px; height: 72px; flex-basis: 72px; }
   .quickstart-achievement h2 { font-size: 1.05rem; }
 }
+
+/* 独立モックとの未反映差分を本体ホームへ最小統合 */
+.home-hero { border: 2px solid var(--fg); border-radius: 0; box-shadow: 7px 8px 0 var(--fg); background: var(--bg); }
+.hero-copy h1 { font-size: clamp(3rem, 6vw, 5.6rem); line-height: 1.05; letter-spacing: -.07em; font-weight: 900; }
+.hero-copy h1::after { content: ""; display: block; width: 72%; height: 8px; margin-top: 8px; background: var(--accent); }
+.hero-copy .lead { color: var(--fg); font-weight: 700; }
+.hero-panel { border: 2px solid var(--fg); border-top: 6px solid var(--accent); border-radius: 0; box-shadow: 6px 7px 0 var(--fg); }
+.home-stats { border-radius: 0; box-shadow: none; border-block: 2px solid var(--fg); }
+.home-roadmap { border: 0; border-radius: 0; box-shadow: none; background: transparent; padding-inline: 0; }
+.home-roadmap-grid { gap: 12px; }
+.roadmap-item { min-height: 160px; padding: 18px; border: 2px solid var(--fg); border-radius: 0; display: flex; flex-direction: column; }
+.roadmap-item:nth-child(1), .roadmap-item:nth-child(7) { background: var(--accent); color: #fff; }
+.roadmap-item:nth-child(2), .roadmap-item:nth-child(8) { background: #ffd83d; color: var(--fg); }
+.roadmap-item:nth-child(3) { background: #b9dbff; color: var(--fg); }
+.roadmap-item:nth-child(4) { background: #c7e5c6; color: var(--fg); }
+.roadmap-item:nth-child(5) { background: #f7c0bd; color: var(--fg); }
+.roadmap-item:nth-child(6) { background: #d6c6f4; color: var(--fg); }
+.roadmap-item .roadmap-copy { margin-top: auto; }
+.roadmap-item .roadmap-arrow { margin-top: 10px; }
+.home-start-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 42px; margin: 0 0 28px; padding: 70px 42px; color: #fff; background: var(--accent); border-block: 2px solid var(--fg); }
+.home-start-copy .eyebrow { color: #fff; }
+.home-start-copy h2 { margin: 0; white-space: pre-line; font-size: clamp(2.5rem, 5vw, 5rem); line-height: 1.03; letter-spacing: -.08em; color: #fff; }
+.home-start-copy > p { font-weight: 700; }
+.home-start-copy > img { display: block; width: 120px; height: 120px; object-fit: contain; margin: 10px 0 -10px auto; filter: drop-shadow(4px 4px 0 var(--fg)); }
+.btn.dark { background: var(--fg); color: #fff; border-color: var(--fg); }
+.home-start-check { padding: 26px 28px; background: var(--card); color: var(--fg); border: 2px solid var(--fg); box-shadow: 6px 7px 0 var(--fg); }
+.home-start-count { display: flex; align-items: end; justify-content: space-between; padding-bottom: 14px; border-bottom: 2px solid var(--fg); font-weight: 800; }
+.home-start-count strong { font-size: 2.5rem; line-height: 1; }
+.home-start-check ol { list-style: none; padding: 0; margin: 16px 0; counter-reset: home-step; }
+.home-start-check li { counter-increment: home-step; padding: 12px 0; border-bottom: 1px solid var(--line); font-weight: 800; }
+.home-start-check li::before { content: counter(home-step, decimal-leading-zero); display: inline-grid; place-items: center; width: 28px; height: 28px; margin-right: 10px; background: #ffd83d; border: 2px solid var(--fg); font-size: .78rem; }
+.home-start-check > p { color: var(--muted); font-size: .86rem; }
+.home-start-achievement { display: flex; align-items: center; gap: 10px; padding: 10px; background: #ffd83d; border: 2px solid var(--fg); font-weight: 800; }
+.home-start-achievement[hidden] { display: none; }
+.home-start-achievement img { width: 58px; height: 58px; object-fit: contain; }
+.home-lab { border-radius: 0; box-shadow: none; background: var(--fg) url("images/characters/step-character-04-error.png") center/cover; background-blend-mode: soft-light; }
+.home-lab-visual { border-radius: 0; border: 2px solid var(--fg); }
+.home-lab-card { border: 2px solid var(--fg); border-radius: 0; }
+.question-entry { border-radius: 0; border: 2px solid var(--fg); }
+.question-chip { border: 2px solid var(--fg); border-radius: 0; min-height: 120px; grid-template-columns: 1fr; align-content: space-between; }
+@media (max-width: 700px) {
+  .home-start-preview { grid-template-columns: 1fr; gap: 28px; padding: 46px 18px; }
+}
+@media (max-width: 480px) {
+  .home-start-copy h2 { font-size: 2.8rem; }
+  .home-start-copy > img { width: 92px; height: 92px; }
+  .home-start-check { padding: 18px; }
+}
+

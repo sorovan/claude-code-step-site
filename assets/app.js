@@ -387,6 +387,27 @@
     ]);
   }
 
+  function homeStartSection() {
+    if (!state.quickstart) return null;
+    var items = state.quickstart.steps || [];
+    var done = quickstartCompletedCount();
+    return el("section", { class: "home-start-preview", "aria-labelledby": "home-start-h" }, [
+      el("div", { class: "home-start-copy" }, [
+        el("p", { class: "eyebrow", text: "START SMALL" }),
+        el("h2", { id: "home-start-h", text: "最初の15分で、\n小さなページを完成。" }),
+        el("p", { text: state.quickstart.summary }),
+        el("img", { src: "assets/images/characters/step-character-01-teacher.png", alt: "考えながら説明する渋沢A壱" }),
+        el("a", { class: "btn dark", href: "#/start", text: "4項目を順番に見る →" })
+      ]),
+      el("div", { class: "home-start-check" }, [
+        el("div", { class: "home-start-count" }, [el("span", { text: "実践の進捗" }), el("strong", { text: done + " / " + items.length })]),
+        el("ol", null, items.map(function (item) { return el("li", { text: item.title }); })),
+        el("p", { text: "できた項目にチェックを付けながら進めます。" }),
+        el("div", { class: "home-start-achievement", hidden: done !== items.length }, [el("img", { src: "assets/images/characters/step-character-06-complete.png", alt: "完成を喜ぶ渋沢A壱" }), el("span", { text: "最初の1回、実験完了！" })])
+      ])
+    ]);
+  }
+
   function quickstartChecklist(item) {
     var wrap = el("section", { class: "quickstart-check card", "aria-labelledby": "quick-check-" + item.id });
     wrap.appendChild(el("h3", { id: "quick-check-" + item.id, text: "確認する" }));
@@ -531,7 +552,7 @@
       toraSpeech.textContent = toraLines[toraIndex];
       say("TORAの案内を更新しました。");
     });
-    var children = [hero, stats, homeRoadmap(), lab, facts, progress, questionChips(), guideCard(), el("p", { class: "note home-note", text: state.config.siteNote })];
+    var children = [hero, stats, homeRoadmap(), homeStartSection(), lab, facts, progress, questionChips(), guideCard(), el("p", { class: "note home-note", text: state.config.siteNote })];
     return [el("div", { class: "home-page" }, children)];
   }
 
@@ -905,3 +926,4 @@
 
   start();
 })();
+
