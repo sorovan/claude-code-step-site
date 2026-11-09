@@ -320,7 +320,7 @@
     var button = el("button", { type: "button", class: "btn", text: "指示文をコピー" });
     var pre = el("pre", { class: "prompt" }, [el("code", { text: prompt })]);
     button.addEventListener("click", function () { copyText(prompt, button); });
-    return el("section", { class: "card", "aria-labelledby": "prompt-h" }, [
+    return el("section", { class: "card prompt-card", "aria-labelledby": "prompt-h" }, [
       el("h3", { id: "prompt-h", text: "コピーする：指示文" }),
       pre,
       el("div", { class: "row" }, [button])
@@ -411,7 +411,7 @@
         el("a", { class: "btn", href: "#/search", text: "困りごとを検索" })
       ])
     ]));
-    return children;
+    return [el("div", { class: "quickstart-page" }, children)];
   }
 
   /* ---------- 画面：トップ ---------- */
@@ -422,32 +422,40 @@
     var last = state.progress.lastStepId ? findStep(state.progress.lastStepId) : null;
     var resumeTarget = last || state.steps[0];
 
-    var children = [
-      el("h1", { text: "Claude CodeのSTEP" }),
-      el("p", { class: "lead", text: "Claude Codeの初回操作から、AIへの指示の書き方、作業ファイルの守り方、GitHubの入口までを、一歩ずつ学べる無料の教材です。" }),
-      quickstartCard(),
-      el("ul", { class: "facts" }, [
-        el("li", { text: "STEP 0〜7はすべて無料で利用できます。" }),
-        el("li", { text: "初心者はSTEP 0から始めてください。経験者は、必要なSTEPから選んで始められます。" }),
-        el("li", { text: "各STEPにはチェックリストと、指示文のコピーボタンがあります。" }),
-        el("li", { text: "GitHub・バックアップ・安全な運用まで学べます。" }),
-        el("li", { text: "対象：Claude Codeを初めて使う人。所要時間の目安はSTEPごとに数分〜30分程度です（個人差があります）。" }),
-        el("li", { text: "個人情報の入力は不要です。進捗はこのブラウザ内にだけ保存されます。" })
+    var hero = el("section", { class: "home-hero" }, [
+      el("div", { class: "hero-copy" }, [
+        el("p", { class: "eyebrow", text: "CLAUDE CODE BEGINNER GUIDE" }),
+        el("h1", { text: "Claude Codeを、最初の1回から安全に使う。" }),
+        el("p", { class: "lead", text: "初回操作から、AIへの指示の書き方、作業ファイルの守り方、GitHubの入口までを、一歩ずつ学べる無料教材です。" }),
+        el("div", { class: "row hero-actions" }, [
+          el("a", { class: "btn primary", href: "#/start", text: "最初の1回を試す →" }),
+          el("a", { class: "btn", href: "#/steps", text: "STEP 0〜7を見る" })
+        ])
       ]),
-      el("p", { class: "progress-line", text: "進捗：" + done + " / " + total + " STEP 完了" }),
-      el("div", { class: "row" }, [
-        el("a", { class: "btn primary", href: "#/step/" + resumeTarget.id, text: done === 0 ? "STEP 0 から始める" : "続きから再開（" + resumeTarget.title + "）" }),
-        el("a", { class: "btn", href: "#/steps", text: "STEP一覧" })
-      ]),
-      el("div", { class: "row" }, [
+      el("aside", { class: "hero-panel" }, [
+        el("p", { class: "eyebrow", text: "YOUR FIRST WIN" }),
+        el("h2", { text: "小さなページを1つ完成させる" }),
+        el("p", { text: "練習用フォルダで作り、実際に開いて確認するところまで進みます。" }),
+        el("p", { class: "hero-stat" }, [el("strong", { text: quickstartCompletedCount() + " / " + (state.quickstart ? state.quickstart.steps.length : 0) }), el("span", { text: "実践の進捗" })]),
+        el("a", { class: "text-link", href: "#/start", text: "実践コースを開く →" })
+      ])
+    ]);
+    var facts = el("section", { class: "home-facts", "aria-label": "この教材で学べること" }, [
+      el("article", { class: "home-fact" }, [el("span", { class: "fact-number", text: "01" }), el("h2", { text: "まず動かす" }), el("p", { text: "最初の会話から、小さな成果物を開くまでを体験します。" })]),
+      el("article", { class: "home-fact" }, [el("span", { class: "fact-number", text: "02" }), el("h2", { text: "安全に守る" }), el("p", { text: "作業場所、バックアップ、危険な依頼を避ける考え方を学びます。" })]),
+      el("article", { class: "home-fact" }, [el("span", { class: "fact-number", text: "03" }), el("h2", { text: "確認して残す" }), el("p", { text: "結果を確認し、GitHubへの入口まで自分で進めます。" })])
+    ]);
+    var progress = el("section", { class: "card home-progress", "aria-labelledby": "home-progress-h" }, [
+      el("div", { class: "section-heading" }, [el("div", null, [el("p", { class: "eyebrow", text: "YOUR PROGRESS" }), el("h2", { id: "home-progress-h", text: "学習の進み具合" })]), el("strong", { text: done + " / " + total + " STEP" })]),
+      el("p", { text: done === 0 ? "STEP 0から始めるか、知りたいテーマを選んでください。" : "続きから再開できます。最後に学んだSTEPは「" + resumeTarget.title + "」です。" }),
+      el("div", { class: "row compact-actions" }, [
+        el("a", { class: "btn primary", href: "#/step/" + resumeTarget.id, text: done === 0 ? "STEP 0から始める" : "続きから再開" }),
         el("a", { class: "btn", href: "#/search", text: "用語・困りごと検索" }),
         el("a", { class: "btn", href: "#/final", text: "最終チェック" })
-      ]),
-      questionChips(),
-      guideCard(),
-      el("p", { class: "note", text: state.config.siteNote })
-    ];
-    return children;
+      ])
+    ]);
+    var children = [hero, facts, progress, questionChips(), guideCard(), el("p", { class: "note home-note", text: state.config.siteNote })];
+    return [el("div", { class: "home-page" }, children)];
   }
 
   /* 無料教材の周辺案内。未公開の項目は「準備中」と表示し、URLは設定しない */
@@ -506,7 +514,7 @@
     var prev = idx > 0 ? state.steps[idx - 1] : null;
     var next = idx < state.steps.length - 1 ? state.steps[idx + 1] : null;
 
-    var checklistWrap = el("section", { class: "card", "aria-labelledby": "check-h" });
+    var checklistWrap = el("section", { class: "card check-card", "aria-labelledby": "check-h" });
     checklistWrap.appendChild(el("h3", { id: "check-h", text: "チェックする" }));
     var checks = getChecks(step.id);
     var ul = el("ul", { class: "checklist" });
@@ -538,10 +546,13 @@
       next ? el("a", { class: "btn primary", href: "#/step/" + next.id, text: "次へ：" + next.title + " →" }) : el("a", { class: "btn primary", href: "#/final", text: "最終チェックへ →" })
     ]);
 
-    var children = [
+    var lessonHeader = el("header", { class: "lesson-header" }, [
       el("p", { class: "crumb", text: "STEP " + step.order + " / " + (state.steps.length - 1) + "　" + (isStepComplete(step) ? "（完了）" : "（未完了）") }),
       el("h1", { text: step.title }),
-      el("p", { class: "lead", text: step.summary }),
+      el("p", { class: "lead", text: step.summary })
+    ]);
+    var children = [
+      lessonHeader,
       renderStepImage(step.image),
       renderBody(step.body),
       renderPrompt(step.prompt),
@@ -556,7 +567,7 @@
     if (step.nextText) children.push(el("p", { class: "next-text", text: "次へ進む：" + step.nextText }));
     children.push(nav);
     children.push(el("p", { class: "meta", text: "教材の更新日：" + step.updatedAt }));
-    return children;
+    return [el("div", { class: "lesson-page" }, children)];
   }
 
   /* ---------- 画面：検索 ---------- */
@@ -585,7 +596,7 @@
     if (!q) {
       children.push(el("p", { class: "lead", text: "キーワードを入れると、STEP・用語集・困りごとを探せます。" }));
       children.push(questionChips());
-      return children;
+      return [el("div", { class: "search-page" }, children)];
     }
 
     var stepHits = state.steps.filter(function (s) { return textOfStep(s).toLowerCase().indexOf(lower) !== -1; });
@@ -614,7 +625,7 @@
           return acc;
         }, []))
       : el("p", { text: "一致する困りごとはありません。" }));
-    return children;
+    return [el("div", { class: "search-page" }, children)];
   }
 
   /* 用語・困りごとの説明と、関連STEPへのリンク（既存のSTEPルートのみ使用） */
