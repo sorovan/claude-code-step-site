@@ -492,6 +492,11 @@ pre.prompt {
 .text-link { font-weight: 800; }
 
 .home-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0 0 26px; }
+.home-stats { display: grid; grid-template-columns: repeat(4, 1fr); margin: 0 0 26px; padding: 16px 20px; background: var(--fg); color: var(--card); border-radius: 14px; box-shadow: var(--shadow-soft); }
+.home-stats > div { display: flex; align-items: baseline; justify-content: center; gap: 7px; padding: 0 12px; border-right: 1px solid color-mix(in srgb, var(--card) 24%, transparent); }
+.home-stats > div:last-child { border-right: 0; }
+.home-stats strong { color: var(--accent); font-size: 1.55rem; line-height: 1; }
+.home-stats span { font-size: 0.86rem; }
 .home-fact { min-height: 170px; padding: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
 .fact-number { color: var(--accent); font-size: 0.82rem; font-weight: 800; letter-spacing: 0.1em; }
 .home-fact h2 { margin: 7px 0 6px; padding: 0; border: 0; font-size: 1.2rem; }
@@ -532,6 +537,11 @@ pre.prompt {
 .lesson-content > .step-figure, .lesson-content > .body, .lesson-content > .prompt-card, .lesson-content > .check-card, .lesson-content > .card, .lesson-content > .next-text, .lesson-content > .pager, .lesson-content > .meta { max-width: 900px; margin-left: auto; margin-right: auto; }
 .lesson-content > .body { padding: 4px 2px; }
 .lesson-content > .body h2 { margin-top: 1.8em; }
+.lesson-content > .body h3 { margin: 2em 0 0.6em; padding: 8px 0 8px 14px; border-left: 4px solid var(--accent); background: var(--accent-soft); font-size: 1.08rem; }
+.lesson-content > .body h3:first-child { margin-top: 0.5em; }
+.lesson-content > .body .try-steps { list-style: none; padding-left: 0; counter-reset: lesson-step; }
+.lesson-content > .body .try-steps li { counter-increment: lesson-step; position: relative; min-height: 38px; margin: 12px 0; padding: 5px 0 5px 46px; }
+.lesson-content > .body .try-steps li::before { content: counter(lesson-step); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--accent-fg); font-weight: 800; }
 .prompt-card { background: var(--surface-soft); }
 .prompt-card h3, .check-card h3 { margin-bottom: 10px; }
 .check-card { border-left: 5px solid var(--done); }
@@ -554,6 +564,10 @@ pre.prompt {
 @media (max-width: 700px) {
   .home-hero { grid-template-columns: 1fr; gap: 24px; padding: 30px 22px; }
   .home-facts { grid-template-columns: 1fr; }
+  .home-stats { grid-template-columns: repeat(2, 1fr); gap: 12px 0; padding: 14px 8px; }
+  .home-stats > div:nth-child(2) { border-right: 0; }
+  .home-stats > div:nth-child(-n+2) { padding-bottom: 8px; }
+  .home-stats > div:nth-child(n+3) { padding-top: 8px; }
   .home-fact { min-height: auto; }
   .hero-copy h1 { font-size: 2.2rem; }
   .section-heading { align-items: flex-start; flex-direction: column; gap: 4px; }

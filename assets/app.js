@@ -445,6 +445,12 @@
       el("article", { class: "home-fact" }, [el("span", { class: "fact-number", text: "02" }), el("h2", { text: "安全に守る" }), el("p", { text: "作業場所、バックアップ、危険な依頼を避ける考え方を学びます。" })]),
       el("article", { class: "home-fact" }, [el("span", { class: "fact-number", text: "03" }), el("h2", { text: "確認して残す" }), el("p", { text: "結果を確認し、GitHubへの入口まで自分で進めます。" })])
     ]);
+    var stats = el("section", { class: "home-stats", "aria-label": "STEPの特徴" }, [
+      el("div", null, [el("strong", { text: String(total) }), el("span", { text: "STEP" })]),
+      el("div", null, [el("strong", { text: "4" }), el("span", { text: "実践項目" })]),
+      el("div", null, [el("strong", { text: "1" }), el("span", { text: "クリックで開始" })]),
+      el("div", null, [el("strong", { text: "0" }), el("span", { text: "個人情報収集" })])
+    ]);
     var progress = el("section", { class: "card home-progress", "aria-labelledby": "home-progress-h" }, [
       el("div", { class: "section-heading" }, [el("div", null, [el("p", { class: "eyebrow", text: "YOUR PROGRESS" }), el("h2", { id: "home-progress-h", text: "学習の進み具合" })]), el("strong", { text: done + " / " + total + " STEP" })]),
       el("p", { text: done === 0 ? "STEP 0から始めるか、知りたいテーマを選んでください。" : "続きから再開できます。最後に学んだSTEPは「" + resumeTarget.title + "」です。" }),
@@ -454,7 +460,7 @@
         el("a", { class: "btn", href: "#/final", text: "最終チェック" })
       ])
     ]);
-    var children = [hero, facts, progress, questionChips(), guideCard(), el("p", { class: "note home-note", text: state.config.siteNote })];
+    var children = [hero, stats, facts, progress, questionChips(), guideCard(), el("p", { class: "note home-note", text: state.config.siteNote })];
     return [el("div", { class: "home-page" }, children)];
   }
 
