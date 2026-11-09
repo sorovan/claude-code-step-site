@@ -434,6 +434,10 @@
       ]),
       el("aside", { class: "hero-panel" }, [
         el("p", { class: "eyebrow", text: "YOUR FIRST WIN" }),
+        el("figure", { class: "hero-visual" }, [
+          el("img", { src: "assets/images/step/step00_what_is_claude_code.png", alt: "フォルダとファイルのつながりを学ぶSTEP 0の図解", width: 1376, height: 768, loading: "eager", decoding: "async" }),
+          el("figcaption", { text: "まずは小さく作り、開いて確かめます。" })
+        ]),
         el("h2", { text: "小さなページを1つ完成させる" }),
         el("p", { text: "練習用フォルダで作り、実際に開いて確認するところまで進みます。" }),
         el("p", { class: "hero-stat" }, [el("strong", { text: quickstartCompletedCount() + " / " + (state.quickstart ? state.quickstart.steps.length : 0) }), el("span", { text: "実践の進捗" })]),
