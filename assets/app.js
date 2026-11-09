@@ -434,11 +434,13 @@
     var items = state.quickstart.steps;
     var done = quickstartCompletedCount();
     var children = [
-      el("p", { class: "crumb", text: "P1｜最初の15分" }),
-      el("h1", { text: state.quickstart.title }),
-      el("p", { class: "lead", text: state.quickstart.summary }),
-      el("div", { class: "quickstart-progress", role: "status", text: "実践の進捗：" + done + " / " + items.length + " 項目" }),
-      el("p", { class: "note", text: "このコースは練習用フォルダで行います。大事なファイルや個人情報は入れず、公開もしないでください。" }),
+      el("header", { class: "page-hero quickstart-hero" }, [
+        el("p", { class: "crumb", text: "P1｜最初の15分" }),
+        el("h1", { text: state.quickstart.title }),
+        el("p", { class: "lead", text: state.quickstart.summary }),
+        el("div", { class: "quickstart-progress", role: "status", text: "実践の進捗：" + done + " / " + items.length + " 項目" }),
+        el("p", { class: "note", text: "このコースは練習用フォルダで行います。大事なファイルや個人情報は入れず、公開もしないでください。" })
+      ]),
       el("figure", { class: "quickstart-visual" }, [
         el("img", {
           src: "assets/images/quickstart/shibusawa-robo-15min.webp",
@@ -603,11 +605,22 @@
         ])
       ]));
     });
-    return [
-      el("h1", { text: "STEP一覧" }),
-      el("p", { class: "lead", text: TOTAL_LABEL + "を順番に進めます。完了済みのSTEPには「完了」と表示されます。" }),
-      list
-    ];
+    var done = completedCount();
+    return [el("div", { class: "steps-page" }, [
+      el("header", { class: "page-hero steps-hero" }, [
+        el("p", { class: "eyebrow", text: "LEARNING ROADMAP" }),
+        el("h1", { text: "STEP一覧" }),
+        el("p", { class: "lead", text: TOTAL_LABEL + "を順番に進めます。完了済みのSTEPには「完了」と表示されます。" })
+      ]),
+      el("section", { class: "steps-overview", "aria-label": "学習進捗" }, [
+        el("div", null, [el("span", { class: "eyebrow", text: "YOUR PROGRESS" }), el("strong", { text: done + " / " + state.steps.length }), el("span", { text: "STEP完了" })]),
+        el("a", { class: "btn primary", href: "#/step/" + (state.steps[0] ? state.steps[0].id : ""), text: done ? "続きから学ぶ →" : "STEP 0から始める →" })
+      ]),
+      el("section", { class: "steps-grid-section", "aria-labelledby": "steps-grid-h" }, [
+        el("div", { class: "section-heading" }, [el("h2", { id: "steps-grid-h", text: "8つのSTEPで、できることを増やす" }), el("span", { class: "section-lead", text: "気になるSTEPから始めても大丈夫です。" })]),
+        list
+      ])
+    ])];
   }
 
   /* ---------- 画面：STEP詳細 ---------- */
@@ -793,9 +806,20 @@
       ]));
     });
     var children = [
-      el("h1", { text: "最終チェック" }),
-      el("p", { class: "lead", text: "完了：" + done + " / " + total + " STEP" }),
-      list
+      el("header", { class: "page-hero final-hero" }, [
+        el("p", { class: "eyebrow", text: "FINISH LINE" }),
+        el("h1", { text: "最終チェック" }),
+        el("p", { class: "lead", text: "完了：" + done + " / " + total + " STEP" })
+      ]),
+      el("section", { class: "final-progress", "aria-label": "学習完了状況" }, [
+        el("span", { class: "eyebrow", text: "YOUR PROGRESS" }),
+        el("strong", { text: done + " / " + total }),
+        el("span", { text: "STEP完了" })
+      ]),
+      el("section", { class: "final-list card", "aria-labelledby": "final-list-h" }, [
+        el("h2", { id: "final-list-h", text: "STEPごとの確認状況" }),
+        list
+      ])
     ];
     if (state.quickstart) {
       var quickDone = quickstartCompletedCount();
@@ -814,7 +838,7 @@
     if (fl) children.push(el("p", null, [fl]));
     var line = linkByKey("officialLine");
     if (line) children.push(el("p", { text: "更新のお知らせは、任意で公式LINEから案内しています（登録は必須ではありません）。" }), el("p", null, [line]));
-    return children;
+    return [el("div", { class: "final-page" }, children)];
   }
 
   /* ---------- ルーター ---------- */
