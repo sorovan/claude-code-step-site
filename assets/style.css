@@ -817,3 +817,65 @@ pre.prompt {
   .final-list .checklist-summary li { align-items: flex-start; flex-direction: column; gap: 3px; }
 }
 
+/* STEP詳細統一：一覧カードの色分けを教材画面にも引き継ぐ */
+.lesson-page {
+  --step-accent: var(--accent);
+  --step-soft: var(--accent-soft);
+  max-width: 1160px;
+  margin: 0 auto;
+}
+.lesson-page.step-accent-1,
+.lesson-page.step-accent-7 { --step-accent: #ffd83d; --step-soft: #fff7cf; }
+.lesson-page.step-accent-2 { --step-accent: #b9dbff; --step-soft: #eaf4ff; }
+.lesson-page.step-accent-3 { --step-accent: #c7e5c6; --step-soft: #eef8ed; }
+.lesson-page.step-accent-4 { --step-accent: #f7c0bd; --step-soft: #fff0ef; }
+.lesson-page.step-accent-5 { --step-accent: #d6c6f4; --step-soft: #f4efff; }
+.lesson-page .lesson-layout { grid-template-columns: 250px minmax(0, 1fr); gap: 34px; }
+.lesson-page .step-rail { border: 2px solid var(--fg); border-top: 8px solid var(--step-accent); border-radius: 0; box-shadow: 6px 7px 0 var(--fg); }
+.lesson-page .step-rail-list li.is-current { border-left-color: var(--step-accent); background: var(--step-soft); }
+.lesson-page .step-rail-list a:hover { background: var(--step-soft); }
+.lesson-page .lesson-header {
+  margin: 0 0 26px;
+  padding: 28px 30px 30px;
+  color: var(--card);
+  background: var(--fg);
+  border: 2px solid var(--fg);
+  border-bottom: 10px solid var(--step-accent);
+  box-shadow: 6px 7px 0 var(--fg);
+}
+.lesson-page .lesson-header .crumb { color: var(--step-accent); font-weight: 900; letter-spacing: .08em; }
+.lesson-page .lesson-header h1 { margin: .35em 0 .2em; font-size: clamp(2.1rem, 4vw, 3.8rem); line-height: 1.08; letter-spacing: -.05em; }
+.lesson-page .lesson-header .lead { color: var(--card); font-size: 1.08rem; font-weight: 700; }
+.lesson-page .lesson-content > .step-figure { margin-top: 0; padding: 10px; background: var(--card); border: 2px solid var(--fg); box-shadow: 5px 6px 0 var(--fg); }
+.lesson-page .lesson-content > .step-figure img { display: block; width: 100%; height: auto; }
+.lesson-page .lesson-content > .body { padding: 4px 0; font-size: 1.04rem; line-height: 1.9; }
+.lesson-page .lesson-content > .body > p:first-of-type { background: var(--step-soft); border-left-color: var(--step-accent); }
+.lesson-page .lesson-content > .body h3 { background: var(--step-soft); border-left-color: var(--step-accent); }
+.lesson-page .lesson-content > .body .try-steps li::before { background: var(--step-accent); color: var(--fg); }
+.lesson-page .prompt-card,
+.lesson-page .check-card,
+.lesson-page .lesson-content > .card { border: 2px solid var(--fg); border-radius: 0; box-shadow: 5px 6px 0 var(--fg); }
+.lesson-page .prompt-card { border-top: 8px solid var(--step-accent); background: var(--card); }
+.lesson-page .prompt { max-height: none; overflow-wrap: anywhere; white-space: pre-wrap; }
+.lesson-page .check-card { border-left: 8px solid var(--step-accent); }
+.lesson-page .checklist label { overflow-wrap: anywhere; }
+.lesson-page .pager { margin-top: 36px; padding-top: 22px; border-top: 2px solid var(--fg); }
+.lesson-page .pager .btn { min-height: 48px; border-radius: 0; border-width: 2px; }
+.lesson-page .pager .btn.primary { background: var(--step-accent); color: var(--fg); border-color: var(--fg); }
+
+@media (max-width: 700px) {
+  .lesson-page .lesson-layout { grid-template-columns: 1fr; gap: 20px; }
+  .lesson-page .step-rail { position: static; }
+  .lesson-page .lesson-header { margin-top: 0; padding: 24px 20px 25px; }
+  .lesson-page .lesson-content > .body { font-size: 1rem; line-height: 1.82; }
+}
+
+@media (max-width: 480px) {
+  .lesson-page .lesson-header h1 { font-size: 2.05rem; }
+  .lesson-page .lesson-header .lead { font-size: 1rem; }
+  .lesson-page .lesson-content > .step-figure { padding: 6px; }
+  .lesson-page .prompt { font-size: .86rem; }
+  .lesson-page .pager { grid-template-columns: 1fr; gap: 10px; }
+  .lesson-page .pager .btn { width: 100%; }
+}
+
