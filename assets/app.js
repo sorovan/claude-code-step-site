@@ -331,7 +331,11 @@
     if (!state.questions.length) return null;
     var chips = el("div", { class: "question-chips" });
     state.questions.forEach(function (q) {
-      var button = el("button", { type: "button", class: "question-chip", text: q.label });
+      var button = el("button", { type: "button", class: "question-chip" }, [
+        el("span", { class: "question-number", text: String(state.questions.indexOf(q) + 1).padStart(2, "0") }),
+        el("span", { class: "question-label", text: q.label }),
+        el("span", { class: "question-query", text: q.query + " →" })
+      ]);
       button.addEventListener("click", function () {
         location.hash = "#/search?q=" + encodeURIComponent(q.query);
       });
@@ -357,6 +361,29 @@
         el("a", { class: "btn primary", href: "#/start", text: done === 0 ? "最初の1回を試す →" : "続きから再開 →" }),
         el("a", { class: "btn", href: "#/steps", text: "STEP 0〜7を見る" })
       ])
+    ]);
+  }
+
+  function homeRoadmap() {
+    var grid = el("div", { class: "home-roadmap-grid" });
+    state.steps.forEach(function (s) {
+      var complete = isStepComplete(s);
+      grid.appendChild(el("a", { class: "roadmap-item" + (complete ? " is-done" : ""), href: "#/step/" + s.id }, [
+        el("span", { class: "roadmap-no", text: String(s.order).padStart(2, "0") }),
+        el("span", { class: "roadmap-copy" }, [
+          el("strong", { text: s.title }),
+          el("small", { text: complete ? "完了" : s.summary })
+        ]),
+        el("span", { class: "roadmap-arrow", text: "→" })
+      ]));
+    });
+    return el("section", { class: "home-roadmap", "aria-labelledby": "roadmap-h" }, [
+      el("div", { class: "section-heading roadmap-heading" }, [
+        el("div", null, [el("p", { class: "eyebrow", text: "LEARNING ROADMAP" }), el("h2", { id: "roadmap-h", text: "8つのSTEPで、できることを増やす" })]),
+        el("a", { class: "text-link", href: "#/steps", text: "一覧を見る →" })
+      ]),
+      el("p", { class: "section-lead", text: "最初の操作から、安全な指示、結果確認、GitHubの入口までを順番に学べます。" }),
+      grid
     ]);
   }
 
@@ -464,7 +491,7 @@
         el("a", { class: "btn", href: "#/final", text: "最終チェック" })
       ])
     ]);
-    var children = [hero, stats, facts, progress, questionChips(), guideCard(), el("p", { class: "note home-note", text: state.config.siteNote })];
+    var children = [hero, stats, homeRoadmap(), facts, progress, questionChips(), guideCard(), el("p", { class: "note home-note", text: state.config.siteNote })];
     return [el("div", { class: "home-page" }, children)];
   }
 
