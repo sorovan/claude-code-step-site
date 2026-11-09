@@ -70,6 +70,8 @@ body {
   line-height: 1.8;
   overflow-wrap: anywhere;
 }
+html[data-font-size="small"] body { font-size: 16px; }
+html[data-font-size="large"] body { font-size: 19px; }
 
 .wrap {
   max-width: 760px;
@@ -512,8 +514,12 @@ pre.prompt {
 
 .lesson-layout { display: grid; grid-template-columns: 220px minmax(0, 900px); gap: 38px; align-items: start; }
 .step-rail { position: sticky; top: 92px; padding: 20px 16px; background: var(--card); border: 1px solid var(--line); border-top: 5px solid var(--accent); border-radius: 14px; box-shadow: var(--shadow-soft); }
-.step-rail h2 { margin: 0.25em 0 0; padding: 0; border: 0; font-size: 1.15rem; }
-.rail-progress { margin: 4px 0 14px; color: var(--accent); font-size: 0.88rem; font-weight: 800; }
+.step-rail summary { list-style: none; cursor: pointer; }
+.step-rail summary::-webkit-details-marker { display: none; }
+.step-rail summary::after { content: "＋"; float: right; color: var(--accent); font-weight: 800; }
+.step-rail[open] summary::after { content: "−"; }
+.rail-title { display: block; margin: 0.25em 0 0; font-size: 1.15rem; font-weight: 800; }
+.rail-progress { display: block; margin: 4px 0 14px; color: var(--accent); font-size: 0.88rem; font-weight: 800; }
 .step-rail-list { list-style: none; padding: 0; margin: 0; }
 .step-rail-list li { border-top: 1px solid var(--line); }
 .step-rail-list a { display: block; padding: 9px 4px; color: var(--muted); font-size: 0.88rem; line-height: 1.45; text-decoration: none; }
@@ -543,6 +549,7 @@ pre.prompt {
   .section-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
   .lesson-layout { grid-template-columns: 1fr; gap: 18px; }
   .step-rail { position: static; padding: 16px; }
+  .step-rail:not([open]) { padding-bottom: 12px; }
   .step-rail-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px; }
 }
 

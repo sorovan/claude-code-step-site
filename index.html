@@ -10,14 +10,19 @@
     /* テーマ：保存済みの選択を描画前に適用する（auto＝端末設定に合わせる。保存不可でも動く） */
     (function () {
       var key = "claude-code-step:theme:v1";
+      var fontKey = "claude-code-step:font-size:v1";
       var mode = "auto";
+      var fontSize = "medium";
       try { var s = window.localStorage.getItem(key); if (s === "light" || s === "dark") mode = s; } catch (e) {}
+      try { var f = window.localStorage.getItem(fontKey); if (f === "small" || f === "large") fontSize = f; } catch (e) {}
       if (mode !== "auto") document.documentElement.setAttribute("data-theme", mode);
+      document.documentElement.setAttribute("data-font-size", fontSize);
       document.addEventListener("DOMContentLoaded", function () {
         var sel = document.getElementById("theme-select");
-        if (!sel) return;
-        sel.value = mode;
-        sel.addEventListener("change", function () {
+        var fontSel = document.getElementById("font-size-select");
+        if (sel) {
+          sel.value = mode;
+          sel.addEventListener("change", function () {
           var v = sel.value;
           if (v === "light" || v === "dark") {
             document.documentElement.setAttribute("data-theme", v);
@@ -25,7 +30,16 @@
             document.documentElement.removeAttribute("data-theme");
           }
           try { window.localStorage.setItem(key, v); } catch (e) {}
-        });
+          });
+        }
+        if (fontSel) {
+          fontSel.value = fontSize;
+          fontSel.addEventListener("change", function () {
+            var v = fontSel.value === "small" || fontSel.value === "large" ? fontSel.value : "medium";
+            document.documentElement.setAttribute("data-font-size", v);
+            try { window.localStorage.setItem(fontKey, v); } catch (e) {}
+          });
+        }
       });
     })();
   </script>
@@ -41,11 +55,18 @@
         <a href="#/search" data-nav="search">検索</a>
         <a href="#/final" data-nav="final">最終チェック</a>
       </nav>
-      <label class="theme-switch">表示
+      <label class="theme-switch">テーマ
         <select id="theme-select">
           <option value="auto">端末設定に合わせる</option>
           <option value="light">ライト</option>
           <option value="dark">ダーク</option>
+        </select>
+      </label>
+      <label class="theme-switch">文字サイズ
+        <select id="font-size-select">
+          <option value="small">小</option>
+          <option value="medium">中</option>
+          <option value="large">大</option>
         </select>
       </label>
     </div>

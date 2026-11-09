@@ -512,12 +512,16 @@
       if (s.id === current.id) link.setAttribute("aria-current", "page");
       list.appendChild(el("li", { class: s.id === current.id ? "is-current" : "" }, [link]));
     });
-    return el("aside", { class: "step-rail", "aria-label": "STEPの目次" }, [
-      el("p", { class: "eyebrow", text: "LEARNING PATH" }),
-      el("h2", { text: "STEPの目次" }),
-      el("p", { class: "rail-progress", text: completedCount() + " / " + state.steps.length + " 完了" }),
+    var details = el("details", { class: "step-rail", "aria-label": "STEPの目次" }, [
+      el("summary", null, [
+        el("span", { class: "eyebrow", text: "LEARNING PATH" }),
+        el("span", { class: "rail-title", text: "STEPの目次" }),
+        el("span", { class: "rail-progress", text: completedCount() + " / " + state.steps.length + " 完了" })
+      ]),
       list
     ]);
+    details.open = window.matchMedia ? window.matchMedia("(min-width: 701px)").matches : true;
+    return details;
   }
 
   function viewStep(id) {
