@@ -261,6 +261,26 @@ h3 { font-size: 1.08rem; font-weight: 700; margin: 1.3em 0 0.4em; }
   background: var(--note-bg);
   font-weight: 800;
 }
+.quickstart-visual {
+  margin: 24px 0 30px;
+  padding: 16px;
+  background: var(--note-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.quickstart-visual img {
+  display: block;
+  width: min(100%, 1120px);
+  height: auto;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+.quickstart-visual figcaption {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
 .quickstart-item {
   margin: 22px 0;
   padding: 18px;
@@ -452,6 +472,8 @@ pre.prompt {
   .step-badge { grid-column: 2; justify-self: start; }
   .card { padding: 14px; }
   .quickstart-item { padding: 14px; }
+  .quickstart-visual { margin: 18px 0 24px; padding: 8px; }
+  .quickstart-visual figcaption { font-size: 0.84rem; text-align: left; }
   .quickstart-item-head { gap: 10px; }
   .quickstart-item-head h2 { font-size: 1.1rem; }
   .quickstart-number { width: 36px; height: 36px; flex-basis: 36px; }

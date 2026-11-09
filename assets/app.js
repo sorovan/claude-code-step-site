@@ -415,7 +415,14 @@
       el("h1", { text: state.quickstart.title }),
       el("p", { class: "lead", text: state.quickstart.summary }),
       el("div", { class: "quickstart-progress", role: "status", text: "実践の進捗：" + done + " / " + items.length + " 項目" }),
-      el("p", { class: "note", text: "このコースは練習用フォルダで行います。大事なファイルや個人情報は入れず、公開もしないでください。" })
+      el("p", { class: "note", text: "このコースは練習用フォルダで行います。大事なファイルや個人情報は入れず、公開もしないでください。" }),
+      el("figure", { class: "quickstart-visual" }, [
+        el("img", {
+          src: "assets/images/quickstart/shibusawa-robo-15min.webp",
+          alt: "渋沢A壱とROBOが、Codeタブ、Local、練習フォルダ、完成ページの順番を案内する図解"
+        }),
+        el("figcaption", { text: "図解の順番に沿って、4つの項目を上から順に進めます。" })
+      ])
     ];
     items.forEach(function (item, i) {
       var card = el("article", { class: "quickstart-item" }, [
