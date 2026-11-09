@@ -4,11 +4,11 @@
   "siteNote": "教材は学習用です。AIの出力や成果、料金・公式情報は保証しません。公式情報は変わるため、リンク先で最新版を確認してください。",
   "links": {
     "freeNote": {
-      "label": "無料noteの受け取り記事を開く",
-      "url": "https://note.com/shibusawa_eichi/n/n0a67d2500b55",
+      "label": "無料STEPの使い方・学習ガイド",
+      "url": "https://note.com/shibusawa_eichi/n/n4ad97bf629dd",
       "enabled": true,
       "shownIn": ["step-6", "final"],
-      "note": "既存の無料note。STEP 6の内容と合う想定。公開前に本文・リンクを現物確認すること。"
+      "note": "STEP紹介記事。公開前に本文・リンクを現物確認すること。"
     },
     "paidNote": {
       "label": "有料note（AI開発初心者のためのGitHub運用スターターキット）",
