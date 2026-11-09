@@ -149,6 +149,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visibl
   border: 1px solid var(--line);
   border-radius: var(--radius);
 }
+.display-controls { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
 
 main { padding: 20px 0 32px; }
 main:focus { outline: none; }
@@ -473,7 +474,7 @@ pre.prompt {
   align-items: stretch;
   margin: 22px 0 26px;
   padding: 48px 42px;
-  background: linear-gradient(135deg, var(--note-bg), var(--card) 68%);
+  background: radial-gradient(circle at 88% 18%, var(--accent-soft), transparent 34%), linear-gradient(135deg, var(--note-bg), var(--card) 68%);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
@@ -539,6 +540,7 @@ pre.prompt {
 .lesson-header .lead { max-width: 760px; font-size: 1.1rem; }
 .lesson-content > .step-figure, .lesson-content > .body, .lesson-content > .prompt-card, .lesson-content > .check-card, .lesson-content > .card, .lesson-content > .next-text, .lesson-content > .pager, .lesson-content > .meta { max-width: 900px; margin-left: auto; margin-right: auto; }
 .lesson-content > .body { padding: 4px 2px; }
+.lesson-content > .body > p:first-of-type { margin-top: 0.6em; padding: 16px 18px; background: var(--surface-soft); border-left: 4px solid var(--accent); border-radius: 10px; }
 .lesson-content > .body h2 { margin-top: 1.8em; }
 .lesson-content > .body h3 { margin: 2em 0 0.6em; padding: 8px 0 8px 14px; border-left: 4px solid var(--accent); background: var(--accent-soft); font-size: 1.08rem; }
 .lesson-content > .body h3:first-child { margin-top: 0.5em; }
@@ -595,4 +597,10 @@ pre.prompt {
   .quickstart-item { padding: 16px; }
   .card { padding: 16px; }
   .search-form .search-input, .search-form .btn { width: 100%; }
+  .header-inner { align-items: flex-start; }
+  .brand { flex: 1 0 100%; }
+  .main-nav { width: 100%; justify-content: space-between; gap: 2px; font-size: 0.82rem; }
+  .display-controls { width: 100%; justify-content: flex-start; gap: 6px 10px; }
+  .theme-switch { font-size: 0.8rem; }
+  .theme-switch select { min-height: 34px; max-width: 165px; }
 }
