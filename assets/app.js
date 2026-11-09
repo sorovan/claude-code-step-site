@@ -8,13 +8,17 @@
 
   var DATA_DIR = "data/";
   var STORAGE_KEY = "claude-code-step:progress:v1";
+  var QUICKSTART_STORAGE_KEY = "claude-code-step:quickstart:v1";
   var TOTAL_LABEL = "STEP 0〜7";
 
   var state = {
     steps: [],
+    quickstart: null,
+    questions: [],
     glossary: null,
     config: null,
     progress: { checks: {}, lastStepId: null },
+    quickstartProgress: { checks: {} },
     storageOk: true,
     memoryOnly: {}
   };
@@ -50,6 +54,31 @@
     }
   }
 
+  function loadQuickstartProgress() {
+    try {
+      var raw = window.localStorage.getItem(QUICKSTART_STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object" && parsed.checks) {
+          state.quickstartProgress = parsed;
+        }
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function saveQuickstartProgress() {
+    if (!state.storageOk) return;
+    try {
+      window.localStorage.setItem(QUICKSTART_STORAGE_KEY, JSON.stringify(state.quickstartProgress));
+    } catch (e) {
+      state.storageOk = false;
+      if (storeNotice) storeNotice.hidden = false;
+    }
+  }
+
   function getChecks(stepId) {
     return state.progress.checks[stepId] || [];
   }
@@ -65,6 +94,21 @@
     saveProgress();
   }
 
+  function getQuickChecks(itemId) {
+    return state.quickstartProgress.checks[itemId] || [];
+  }
+
+  function setQuickCheck(itemId, index, value) {
+    var item = findQuickstartStep(itemId);
+    var arr = (state.quickstartProgress.checks[itemId] || []).slice();
+    for (var i = 0; i < item.checklist.length; i++) {
+      if (arr[i] === undefined) arr[i] = false;
+    }
+    arr[index] = !!value;
+    state.quickstartProgress.checks[itemId] = arr;
+    saveQuickstartProgress();
+  }
+
   function isStepComplete(step) {
     var checks = getChecks(step.id);
     if (!step.checklist.length) return false;
@@ -77,6 +121,31 @@
   function completedCount() {
     var n = 0;
     state.steps.forEach(function (s) { if (isStepComplete(s)) n++; });
+    return n;
+  }
+
+  function findQuickstartStep(id) {
+    var items = state.quickstart ? state.quickstart.steps : [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].id === id) return items[i];
+    }
+    return null;
+  }
+
+  function isQuickstartStepComplete(item) {
+    var checks = getQuickChecks(item.id);
+    if (!item.checklist.length) return false;
+    for (var i = 0; i < item.checklist.length; i++) {
+      if (!checks[i]) return false;
+    }
+    return true;
+  }
+
+  function quickstartCompletedCount() {
+    var n = 0;
+    (state.quickstart ? state.quickstart.steps : []).forEach(function (item) {
+      if (isQuickstartStepComplete(item)) n++;
+    });
     return n;
   }
 
@@ -258,6 +327,93 @@
     ]);
   }
 
+  function questionChips() {
+    if (!state.questions.length) return null;
+    var chips = el("div", { class: "question-chips" });
+    state.questions.forEach(function (q) {
+      var button = el("button", { type: "button", class: "question-chip", text: q.label });
+      button.addEventListener("click", function () {
+        location.hash = "#/search?q=" + encodeURIComponent(q.query);
+      });
+      chips.appendChild(button);
+    });
+    return el("section", { class: "card question-entry", "aria-labelledby": "question-entry-h" }, [
+      el("h2", { id: "question-entry-h", text: "今の疑問から探す" }),
+      el("p", { text: "質問を1つ選ぶと、既存の用語・困りごと検索へ移動します。" }),
+      chips
+    ]);
+  }
+
+  function quickstartCard() {
+    if (!state.quickstart) return null;
+    var total = state.quickstart.steps.length;
+    var done = quickstartCompletedCount();
+    return el("section", { class: "card quickstart-card", "aria-labelledby": "quickstart-card-h" }, [
+      el("p", { class: "eyebrow", text: "P1｜最初の15分" }),
+      el("h2", { id: "quickstart-card-h", text: state.quickstart.title }),
+      el("p", { text: state.quickstart.summary }),
+      el("p", { class: "progress-line", text: "実践の進捗：" + done + " / " + total + " 項目" }),
+      el("div", { class: "row" }, [
+        el("a", { class: "btn primary", href: "#/start", text: done === 0 ? "最初の1回を試す →" : "続きから再開 →" }),
+        el("a", { class: "btn", href: "#/steps", text: "STEP 0〜7を見る" })
+      ])
+    ]);
+  }
+
+  function quickstartChecklist(item) {
+    var wrap = el("section", { class: "quickstart-check card", "aria-labelledby": "quick-check-" + item.id });
+    wrap.appendChild(el("h3", { id: "quick-check-" + item.id, text: "確認する" }));
+    var checks = getQuickChecks(item.id);
+    var ul = el("ul", { class: "checklist" });
+    item.checklist.forEach(function (text, i) {
+      var cid = "quick-chk-" + item.id + "-" + i;
+      var input = el("input", { type: "checkbox", id: cid, checked: !!checks[i] });
+      input.addEventListener("change", function () {
+        setQuickCheck(item.id, i, input.checked);
+        say(input.checked ? "最初の15分の確認を保存しました。" : "確認を外しました。");
+        if (isQuickstartStepComplete(item)) say("この実践項目の確認がすべて済みました。");
+      });
+      ul.appendChild(el("li", null, [input, el("label", { for: cid, text: text })]));
+    });
+    wrap.appendChild(ul);
+    return wrap;
+  }
+
+  function viewQuickstart() {
+    if (!state.quickstart) return [el("h1", { text: "実践コースを読み込めませんでした" })];
+    var items = state.quickstart.steps;
+    var done = quickstartCompletedCount();
+    var children = [
+      el("p", { class: "crumb", text: "P1｜最初の15分" }),
+      el("h1", { text: state.quickstart.title }),
+      el("p", { class: "lead", text: state.quickstart.summary }),
+      el("div", { class: "quickstart-progress", role: "status", text: "実践の進捗：" + done + " / " + items.length + " 項目" }),
+      el("p", { class: "note", text: "このコースは練習用フォルダで行います。大事なファイルや個人情報は入れず、公開もしないでください。" })
+    ];
+    items.forEach(function (item, i) {
+      var card = el("article", { class: "quickstart-item" }, [
+        el("div", { class: "quickstart-item-head" }, [
+          el("span", { class: "quickstart-number", text: String(item.order).padStart(2, "0") }),
+          el("div", null, [el("h2", { text: item.title }), el("p", { class: "meta", text: item.summary })])
+        ]),
+        renderBody(item.body),
+        renderPrompt(item.prompt),
+        quickstartChecklist(item)
+      ]);
+      children.push(card);
+      if (i < items.length - 1) children.push(el("p", { class: "quickstart-arrow", text: "次へ ↓" }));
+    });
+    children.push(el("section", { class: "card quickstart-finish" }, [
+      el("h2", { text: "できたら次へ" }),
+      el("p", { text: done === items.length ? "小さな成果物を完成させました。次はSTEP 0〜7で安全な進め方を深めます。" : "4項目を順番に確認すると、最初の成果物まで進められます。" }),
+      el("div", { class: "row" }, [
+        el("a", { class: "btn primary", href: "#/step/step-0", text: "STEP 0から学ぶ →" }),
+        el("a", { class: "btn", href: "#/search", text: "困りごとを検索" })
+      ])
+    ]));
+    return children;
+  }
+
   /* ---------- 画面：トップ ---------- */
 
   function viewHome() {
@@ -269,6 +425,7 @@
     var children = [
       el("h1", { text: "Claude CodeのSTEP" }),
       el("p", { class: "lead", text: "Claude Codeの初回操作から、AIへの指示の書き方、作業ファイルの守り方、GitHubの入口までを、一歩ずつ学べる無料の教材です。" }),
+      quickstartCard(),
       el("ul", { class: "facts" }, [
         el("li", { text: "STEP 0〜7はすべて無料で利用できます。" }),
         el("li", { text: "初心者はSTEP 0から始めてください。経験者は、必要なSTEPから選んで始められます。" }),
@@ -286,6 +443,7 @@
         el("a", { class: "btn", href: "#/search", text: "用語・困りごと検索" }),
         el("a", { class: "btn", href: "#/final", text: "最終チェック" })
       ]),
+      questionChips(),
       guideCard(),
       el("p", { class: "note", text: state.config.siteNote })
     ];
@@ -426,6 +584,7 @@
     var children = [el("h1", { text: "用語・困りごと検索" }), form];
     if (!q) {
       children.push(el("p", { class: "lead", text: "キーワードを入れると、STEP・用語集・困りごとを探せます。" }));
+      children.push(questionChips());
       return children;
     }
 
@@ -494,6 +653,14 @@
       el("p", { class: "lead", text: "完了：" + done + " / " + total + " STEP" }),
       list
     ];
+    if (state.quickstart) {
+      var quickDone = quickstartCompletedCount();
+      children.push(el("section", { class: "card", "aria-labelledby": "quick-final-h" }, [
+        el("h2", { id: "quick-final-h", text: "最初の15分" }),
+        el("p", { text: "実践の進捗：" + quickDone + " / " + state.quickstart.steps.length + " 項目" }),
+        el("a", { class: "btn", href: "#/start", text: quickDone === state.quickstart.steps.length ? "実践を見直す →" : "実践を続ける →" })
+      ]));
+    }
     if (done === total) {
       children.push(el("p", { text: "STEP 0〜7の確認がすべて済みました。おつかれさまでした。" }));
     } else {
@@ -523,6 +690,9 @@
     var titleText = "Claude CodeのSTEP";
     if (path === "/" || path === "") {
       content = viewHome();
+    } else if (path === "/start") {
+      content = viewQuickstart();
+      titleText = "最初の15分";
     } else if (path === "/steps") {
       content = viewStepList();
     } else if (path.indexOf("/step/") === 0) {
@@ -554,6 +724,7 @@
     for (var i = 0; i < links.length; i++) {
       var key = links[i].getAttribute("data-nav");
       var active = (key === "home" && (path === "/" || path === "")) ||
+                   (key === "start" && path === "/start") ||
                    (key === "steps" && (path === "/steps" || path.indexOf("/step/") === 0)) ||
                    (key === "search" && path === "/search") ||
                    (key === "final" && path === "/final");
@@ -591,13 +762,15 @@
 
   function start() {
     bindSkipLink();
-    state.storageOk = loadProgress();
+    state.storageOk = loadProgress() && loadQuickstartProgress();
     if (!state.storageOk && storeNotice) storeNotice.hidden = false;
-    Promise.all([fetchJson("steps.json"), fetchJson("glossary.json"), fetchJson("config.json")])
+    Promise.all([fetchJson("steps.json"), fetchJson("glossary.json"), fetchJson("config.json"), fetchJson("quickstart.json"), fetchJson("questions.json")])
       .then(function (res) {
         state.steps = (res[0].steps || []).slice().sort(function (a, b) { return a.order - b.order; });
         state.glossary = res[1];
         state.config = res[2];
+        state.quickstart = res[3];
+        state.questions = res[4].questions || [];
         window.addEventListener("hashchange", route);
         if (!location.hash) location.hash = "#/";
         route();

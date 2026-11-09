@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "questions": [
+    { "id": "start", "label": "何から始める？", "query": "最初の会話", "description": "まず小さく作ってみたい" },
+    { "id": "screen", "label": "画面のどこを押す？", "query": "環境準備", "description": "Codeや作業場所を確認したい" },
+    { "id": "prompt", "label": "どう頼めばいい？", "query": "指示文", "description": "コピーできる依頼文を探したい" },
+    { "id": "trouble", "label": "途中で困った", "query": "困りごと", "description": "よくあるつまずきから探したい" }
+  ]
+}

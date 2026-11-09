@@ -160,6 +160,7 @@ h1 {
   margin: 0.5em 0 0.45em;
   text-wrap: balance;
 }
+h1:focus { outline: none; }
 h2 {
   font-size: 1.3rem;
   font-weight: 700;
@@ -175,6 +176,13 @@ h3 { font-size: 1.08rem; font-weight: 700; margin: 1.3em 0 0.4em; }
 
 .facts li { margin-bottom: 4px; }
 .progress-line { font-weight: 700; }
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
 
 .store-notice {
   margin: 12px 0 0;
@@ -208,6 +216,80 @@ h3 { font-size: 1.08rem; font-weight: 700; margin: 1.3em 0 0.4em; }
   font-weight: 700;
 }
 .btn.primary:hover { filter: brightness(1.08); }
+.quickstart-card {
+  border-top: 5px solid var(--accent);
+  padding-top: 14px;
+}
+.quickstart-card h2 { margin-top: 0.25em; }
+.question-entry {
+  background: var(--note-bg);
+}
+.question-entry h2 { margin-top: 0; }
+.question-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.question-chip {
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+.question-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+.quickstart-progress {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-left: 4px solid var(--accent);
+  background: var(--note-bg);
+  font-weight: 800;
+}
+.quickstart-item {
+  margin: 22px 0;
+  padding: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.quickstart-item-head {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.quickstart-item-head h2 { margin: 0; border: 0; padding: 0; }
+.quickstart-item-head .meta { margin: 4px 0 0; }
+.quickstart-number {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 800;
+}
+.quickstart-item .body { margin-top: 10px; }
+.quickstart-item .card {
+  margin: 16px 0 0;
+  background: var(--note-bg);
+}
+.quickstart-item .card h3 { margin-top: 0; }
+.quickstart-arrow {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 800;
+  text-align: center;
+}
+.quickstart-finish {
+  border: 2px solid var(--accent);
+}
+.quickstart-finish h2 { margin-top: 0; }
 
 /* カード：面の区別だけに使う。影はつけない */
 .card {
@@ -357,6 +439,11 @@ pre.prompt {
   .step-link { grid-template-columns: auto 1fr; }
   .step-badge { grid-column: 2; justify-self: start; }
   .card { padding: 14px; }
+  .quickstart-item { padding: 14px; }
+  .quickstart-item-head { gap: 10px; }
+  .quickstart-item-head h2 { font-size: 1.1rem; }
+  .quickstart-number { width: 36px; height: 36px; flex-basis: 36px; }
+  .question-chip { width: 100%; text-align: left; }
 }
 
 @media (prefers-reduced-motion: reduce) {
