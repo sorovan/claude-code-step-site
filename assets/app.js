@@ -626,45 +626,50 @@
 
     children.push(el("h2", { text: "STEP（" + stepHits.length + "件）" }));
     children.push(stepHits.length
-      ? el("ul", null, stepHits.map(function (s) { return el("li", null, [el("a", { href: "#/step/" + s.id, text: "STEP " + s.order + "：" + s.title })]); }))
+      ? el("div", { class: "search-results" }, stepHits.map(function (s) {
+          return resultCard("STEP " + s.order, s.title, s.summary, null, "#/step/" + s.id);
+        }))
       : el("p", { text: "一致するSTEPはありません。" }));
 
     children.push(el("h2", { text: "用語（" + termHits.length + "件）" }));
     children.push(termHits.length
-      ? el("dl", { class: "glossary" }, termHits.reduce(function (acc, g) {
-          acc.push(el("dt", { text: g.term }));
-          acc.push(glossaryDd(g.meaning, g.stepIds));
-          return acc;
-        }, []))
+      ? el("div", { class: "search-results" }, termHits.map(function (g) {
+          return resultCard("用語", g.term, g.meaning, g.stepIds, null);
+        }))
       : el("p", { text: "一致する用語はありません。" }));
 
     children.push(el("h2", { text: "困りごと（" + troubleHits.length + "件）" }));
     children.push(troubleHits.length
-      ? el("dl", { class: "glossary" }, troubleHits.reduce(function (acc, t) {
-          acc.push(el("dt", { text: t.question }));
-          acc.push(glossaryDd(t.answer, t.stepIds));
-          return acc;
-        }, []))
+      ? el("div", { class: "search-results" }, troubleHits.map(function (t) {
+          return resultCard("困りごと", t.question, t.answer, t.stepIds, null);
+        }))
       : el("p", { text: "一致する困りごとはありません。" }));
     return [el("div", { class: "search-page" }, children)];
   }
 
-  /* 用語・困りごとの説明と、関連STEPへのリンク（既存のSTEPルートのみ使用） */
-  function glossaryDd(text, stepIds) {
+  /* 検索結果1件のカード表示（データ構造は変えず、表示だけを変える） */
+  function resultCard(kind, title, body, stepIds, href) {
+    var heading = el("h3", null, [href ? el("a", { href: href, text: title }) : el("span", { text: title })]);
+    var children = [el("p", { class: "eyebrow", text: kind }), heading];
+    if (body) children.push(el("p", { class: "result-body", text: body }));
+    var related = relatedStepLinks(stepIds);
+    if (related) children.push(related);
+    return el("article", { class: "card search-result" }, children);
+  }
+
+  /* 関連STEPへのリンク（既存のSTEPルートのみ使用）。該当がなければ null */
+  function relatedStepLinks(stepIds) {
     var links = (stepIds || []).filter(function (id) { return findStep(id); }).map(function (id) {
       var s = findStep(id);
       return el("a", { href: "#/step/" + s.id, text: "STEP " + s.order + "：" + s.title });
     });
-    var children = [el("span", { text: text })];
-    if (links.length) {
-      children.push(el("br"));
-      children.push(el("span", { class: "related", text: "関連STEP：" }));
-      links.forEach(function (a, i) {
-        if (i > 0) children.push(el("span", { text: "・" }));
-        children.push(a);
-      });
-    }
-    return el("dd", null, children);
+    if (!links.length) return null;
+    var children = [el("span", { class: "related", text: "関連STEP：" })];
+    links.forEach(function (a, i) {
+      if (i > 0) children.push(el("span", { text: "・" }));
+      children.push(a);
+    });
+    return el("p", { class: "result-related" }, children);
   }
 
   /* ---------- 画面：最終チェック ---------- */
