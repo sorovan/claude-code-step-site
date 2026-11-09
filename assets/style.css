@@ -485,7 +485,7 @@ pre.prompt {
 .hero-actions .btn { min-width: 170px; }
 .hero-panel { align-self: center; padding: 22px; background: var(--card); border: 1px solid var(--line); border-top: 5px solid var(--accent); border-radius: 14px; box-shadow: var(--shadow-soft); }
 .hero-visual { margin: 10px 0 18px; }
-.hero-visual img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border: 1px solid var(--line); border-radius: 10px; }
+.hero-visual img { display: block; width: 100%; height: 150px; aspect-ratio: 16 / 9; object-fit: cover; border: 1px solid var(--line); border-radius: 10px; }
 .hero-visual figcaption { margin-top: 7px; color: var(--muted); font-size: 0.83rem; line-height: 1.5; }
 .hero-panel h2 { margin: 0.25em 0 0.45em; padding: 0; border: 0; font-size: 1.45rem; line-height: 1.35; }
 .hero-panel p:not(.eyebrow):not(.hero-stat) { margin: 0; color: var(--muted); }
@@ -588,6 +588,7 @@ pre.prompt {
   .hero-actions .btn { width: 100%; }
   .hero-panel { padding: 20px; }
   .hero-visual { margin-bottom: 14px; }
+  .hero-visual img { height: 150px; }
   .home-progress { padding: 18px; }
   .compact-actions .btn { width: 100%; }
   .quickstart-page > h1, .lesson-header h1, .search-page > h1 { font-size: 1.9rem; }
