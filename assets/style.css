@@ -611,6 +611,36 @@ pre.prompt {
 .search-result .result-related { margin: auto 0 0; padding-top: 6px; font-size: 0.92rem; overflow-wrap: anywhere; }
 .search-result .result-related .related { color: var(--muted); }
 
+/* TORA統合：既存のSTEP UIに、画像と小さな実験導線だけを追加 */
+.hero-visual img[src*="characters"] { height: 220px; object-fit: contain; background: var(--surface-soft); }
+.tora-guide { margin: 16px 0 10px; padding: 12px 14px; background: var(--accent-soft); border-left: 4px solid var(--accent); }
+.tora-guide strong { display: block; color: var(--accent); font-size: .82rem; letter-spacing: .06em; }
+.tora-guide p { margin: 3px 0 8px; font-weight: 700; }
+.tora-guide .btn { min-height: 36px; padding: 6px 12px; font-size: .88rem; }
+.quickstart-guide { display: flex; align-items: center; gap: 14px; margin: 18px 0 24px; padding: 12px 16px; background: var(--accent-soft); border: 1px solid var(--line); border-radius: 12px; }
+.quickstart-guide img { width: 86px; height: 86px; object-fit: contain; flex: 0 0 86px; }
+.quickstart-guide p { margin: 0; font-weight: 700; }
+.quickstart-achievement { display: flex; align-items: center; gap: 18px; border: 2px solid var(--accent); background: var(--accent-soft); }
+.quickstart-achievement[hidden] { display: none; }
+.quickstart-achievement img { width: 104px; height: 104px; object-fit: contain; flex: 0 0 104px; }
+.quickstart-achievement h2 { margin: 0 0 4px; padding: 0; border: 0; font-size: 1.25rem; }
+.quickstart-achievement p { margin: 0; color: var(--muted); }
+.home-lab { margin: 0 0 28px; padding: 26px; color: var(--card); background: var(--fg); border-radius: 16px; box-shadow: var(--shadow-soft); }
+.home-lab .section-heading { align-items: center; }
+.home-lab h2 { margin: .1em 0 0; padding: 0; border: 0; color: var(--card); }
+.home-lab .eyebrow { color: var(--accent); }
+.lab-caption { color: var(--muted); font-size: .88rem; }
+.home-lab-visual { display: flex; align-items: center; gap: 16px; margin: 20px 0; padding: 12px 16px; color: var(--fg); background: var(--accent-soft); border: 1px solid var(--line); border-radius: 12px; }
+.home-lab-visual img { width: 110px; height: 110px; object-fit: contain; flex: 0 0 110px; }
+.home-lab-visual p { margin: 0; font-weight: 800; }
+.home-lab-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.home-lab-card { color: var(--fg); background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.home-lab-card summary { display: flex; justify-content: space-between; gap: 10px; padding: 16px; cursor: pointer; list-style: none; font-weight: 800; }
+.home-lab-card summary::-webkit-details-marker { display: none; }
+.home-lab-card summary span { color: var(--accent); white-space: nowrap; }
+.home-lab-card > p, .home-lab-card > code { display: block; margin: 0; padding: 0 16px 14px; }
+.home-lab-card > code { padding-top: 12px; color: var(--fg); background: var(--surface-soft); font-family: inherit; font-size: .86rem; white-space: pre-wrap; }
+
 @media (max-width: 700px) {
   .home-hero { grid-template-columns: 1fr; gap: 24px; padding: 30px 22px; }
   .home-facts { grid-template-columns: 1fr; }
@@ -626,6 +656,7 @@ pre.prompt {
   .step-rail { position: static; padding: 16px; }
   .step-rail:not([open]) { padding-bottom: 12px; }
   .step-rail-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px; }
+  .home-lab-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
@@ -653,4 +684,15 @@ pre.prompt {
   .display-controls { width: 100%; justify-content: flex-start; gap: 6px 10px; }
   .theme-switch { font-size: 0.8rem; }
   .theme-switch select { min-height: 34px; max-width: 165px; }
+  .hero-visual img[src*="characters"] { height: 180px; }
+  .home-lab { padding: 18px; }
+  .home-lab .section-heading { gap: 8px; }
+  .lab-caption { font-size: .8rem; }
+  .home-lab-visual { align-items: flex-start; padding: 10px; }
+  .home-lab-visual img { width: 90px; height: 90px; flex-basis: 90px; }
+  .quickstart-guide { align-items: flex-start; padding: 10px 12px; }
+  .quickstart-guide img { width: 68px; height: 68px; flex-basis: 68px; }
+  .quickstart-achievement { align-items: flex-start; gap: 10px; padding: 12px; }
+  .quickstart-achievement img { width: 72px; height: 72px; flex-basis: 72px; }
+  .quickstart-achievement h2 { font-size: 1.05rem; }
 }

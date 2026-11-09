@@ -399,6 +399,8 @@
         setQuickCheck(item.id, i, input.checked);
         say(input.checked ? "最初の15分の確認を保存しました。" : "確認を外しました。");
         if (isQuickstartStepComplete(item)) say("この実践項目の確認がすべて済みました。");
+        var achievement = document.querySelector("[data-quick-achievement]");
+        if (achievement) achievement.hidden = quickstartCompletedCount() !== state.quickstart.steps.length;
       });
       ul.appendChild(el("li", null, [input, el("label", { for: cid, text: text })]));
     });
@@ -422,6 +424,10 @@
           alt: "渋沢A壱とROBOが、Codeタブ、Local、練習フォルダ、完成ページの順番を案内する図解"
         }),
         el("figcaption", { text: "図解の順番に沿って、4つの項目を上から順に進めます。" })
+      ]),
+      el("aside", { class: "quickstart-guide" }, [
+        el("img", { src: "assets/images/characters/step-character-01-teacher.png", alt: "考えながら説明する渋沢A壱" }),
+        el("p", { text: "まずは練習用フォルダで、小さく試してみましょう。" })
       ])
     ];
     items.forEach(function (item, i) {
@@ -437,6 +443,10 @@
       children.push(card);
       if (i < items.length - 1) children.push(el("p", { class: "quickstart-arrow", text: "次へ ↓" }));
     });
+    children.push(el("section", { class: "card quickstart-achievement", "data-quick-achievement": "", hidden: done !== items.length }, [
+      el("img", { src: "assets/images/characters/step-character-06-complete.png", alt: "完成を喜ぶ渋沢A壱" }),
+      el("div", null, [el("h2", { text: "最初の1回、実験完了！" }), el("p", { text: "小さな成果物を完成させました。次はSTEP 0〜7から、気になる場所へ進めます。" })])
+    ]));
     children.push(el("section", { class: "card quickstart-finish" }, [
       el("h2", { text: "できたら次へ" }),
       el("p", { text: done === items.length ? "小さな成果物を完成させました。次はSTEP 0〜7で安全な進め方を深めます。" : "4項目を順番に確認すると、最初の成果物まで進められます。" }),
@@ -469,11 +479,16 @@
       el("aside", { class: "hero-panel" }, [
         el("p", { class: "eyebrow", text: "YOUR FIRST WIN" }),
         el("figure", { class: "hero-visual" }, [
-          el("img", { src: "assets/images/step/step00_what_is_claude_code.png", alt: "フォルダとファイルのつながりを学ぶSTEP 0の図解", width: 1376, height: 768, loading: "eager", decoding: "async" }),
-          el("figcaption", { text: "まずは小さく作り、開いて確かめます。" })
+          el("img", { src: "assets/images/characters/step-character-07-tora-dialogue.png", alt: "TORAと掛け合いながら説明する渋沢A壱", width: 1448, height: 1086, loading: "eager", decoding: "async" }),
+          el("figcaption", { text: "渋沢A壱とTORAが、最初の一歩を案内します。" })
         ]),
         el("h2", { text: "小さなページを1つ完成させる" }),
         el("p", { text: "練習用フォルダで作り、実際に開いて確認するところまで進みます。" }),
+        el("div", { class: "tora-guide" }, [
+          el("strong", { text: "TORAのひとこと" }),
+          el("p", { "data-tora-speech": "", text: "まずは小さく作ってみよ！" }),
+          el("button", { class: "btn", type: "button", "data-tora-control": "", text: "TORAに聞く" })
+        ]),
         el("p", { class: "hero-stat" }, [el("strong", { text: quickstartCompletedCount() + " / " + (state.quickstart ? state.quickstart.steps.length : 0) }), el("span", { text: "実践の進捗" })]),
         el("a", { class: "text-link", href: "#/start", text: "実践コースを開く →" })
       ])
@@ -498,8 +513,35 @@
         el("a", { class: "btn", href: "#/final", text: "最終チェック" })
       ])
     ]);
-    var children = [hero, stats, homeRoadmap(), facts, progress, questionChips(), guideCard(), el("p", { class: "note home-note", text: state.config.siteNote })];
+    var lab = el("section", { class: "home-lab", "aria-labelledby": "home-lab-h" }, [
+      el("div", { class: "section-heading" }, [el("div", null, [el("p", { class: "eyebrow", text: "TORA'S DIGITAL LAB" }), el("h2", { id: "home-lab-h", text: "TORAの電脳実験室" })]), el("span", { class: "lab-caption", text: "カードを開いて、最初の指示文を見る" })]),
+      el("div", { class: "home-lab-visual" }, [el("img", { src: "assets/images/characters/step-character-08-tora-lab.png", alt: "電脳実験に驚く渋沢A壱" }), el("p", { text: "正解を急がず、まずは小さく試してみます。" })]),
+      el("div", { class: "home-lab-grid" }, [
+        labExperiment("猫が社長の会社サイトを作る", "会社紹介・社長紹介・問い合わせ先の3項目から始めます。", "猫が社長の会社サイトを、小さなindex.htmlとして作ってください。"),
+        labExperiment("押すたびに褒めてくれるボタンを作る", "クリックするたびに短いメッセージが変わる実験です。", "押すたびに表示が変わるボタンのページを作ってください。"),
+        labExperiment("今日の運勢が出るページを作る", "外部APIなしで、用意した候補から表示します。", "今日の運勢を表示する小さなページを作ってください。")
+      ])
+    ]);
+    var toraLines = ["まずは小さく作ってみよ！", "そこ消したらアカン！", "完成したら自分で開いて確認や！", "次は何を実験する？"];
+    var toraIndex = 0;
+    var toraButton = hero.querySelector("[data-tora-control]");
+    var toraSpeech = hero.querySelector("[data-tora-speech]");
+    if (toraButton && toraSpeech) toraButton.addEventListener("click", function () {
+      toraIndex = (toraIndex + 1) % toraLines.length;
+      toraSpeech.textContent = toraLines[toraIndex];
+      say("TORAの案内を更新しました。");
+    });
+    var children = [hero, stats, homeRoadmap(), lab, facts, progress, questionChips(), guideCard(), el("p", { class: "note home-note", text: state.config.siteNote })];
     return [el("div", { class: "home-page" }, children)];
+  }
+
+  function labExperiment(title, summary, prompt) {
+    var details = el("details", { class: "home-lab-card" }, [
+      el("summary", null, [el("strong", { text: title }), el("span", { text: "ひらく →" })]),
+      el("p", { text: summary }),
+      el("code", { text: prompt })
+    ]);
+    return details;
   }
 
   /* 無料教材の周辺案内。未公開の項目は「準備中」と表示し、URLは設定しない */
