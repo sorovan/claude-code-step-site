@@ -45,9 +45,11 @@
   document.addEventListener('click',function(e){var a=e.target.closest('a');if(a&&a.href==='https://lin.ee/8NRgx9E')emit('line_click',{screen_id:screen()});});
   document.addEventListener('DOMContentLoaded',function(){
     if(!/^G-[A-Z0-9]+$/.test(id))return;
-    var area=document.createElement('aside');area.setAttribute('aria-label','アクセス解析の設定');
+    var choice=null;try{choice=localStorage.getItem('claude-code-step:analytics-consent:v1');}catch(e){}
+    var area=document.createElement('details');area.setAttribute('aria-label','アクセス解析の設定');area.open=choice!=='granted'&&choice!=='denied';
+    var summary=document.createElement('summary');summary.textContent='アクセス解析の設定';summary.style.fontSize='0.85rem';summary.style.cursor='pointer';area.appendChild(summary);
     var text=document.createElement('p');text.textContent='利用状況の改善にGoogle Analyticsを使用します。許可すると画面閲覧・コピー・LINEリンクのクリックをGoogleへ送信します。入力内容は送信しません。';area.appendChild(text);
-    ['許可する','許可しない'].forEach(function(label,i){var button=document.createElement('button');button.textContent=label;button.type='button';button.className='btn';button.onclick=function(){try{localStorage.setItem('claude-code-step:analytics-consent:v1',i?'denied':'granted');}catch(e){}if(!i)enable();else {active=false;previous='';window['ga-disable-'+id]=true;}area.querySelector('p').textContent=i?'アクセス解析を停止しています。':'アクセス解析を許可しています。';};area.appendChild(button);});
+    ['許可する','許可しない'].forEach(function(label,i){var button=document.createElement('button');button.textContent=label;button.type='button';button.className='btn';button.onclick=function(){try{localStorage.setItem('claude-code-step:analytics-consent:v1',i?'denied':'granted');}catch(e){}if(!i)enable();else {active=false;previous='';window['ga-disable-'+id]=true;}area.open=false;summary.focus();};area.appendChild(button);});
     document.querySelector('.site-footer .wrap').appendChild(area);
     try{if(localStorage.getItem('claude-code-step:analytics-consent:v1')==='granted')enable();}catch(e){}
   });
