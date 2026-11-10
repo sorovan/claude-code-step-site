@@ -21,21 +21,22 @@
     previous = path;
     var params={page_location:location.origin + '/#' + path,page_title:'Claude CodeのSTEP',page_referrer:''};
     var campaign=new URLSearchParams(location.search);['source','medium','campaign'].forEach(function(k){var v=campaign.get('utm_'+k);if(v)params[k==='campaign'?'campaign_name':'campaign_'+k]=v;});
-    emit('page_view', params);
+    window.gtag('set',params); // Enhanced measurement owns page_view; never emit it twice.
     if (/^\/step\/step-[0-7]$/.test(path)) emit('step_view',{step_id:path.slice(6)});
     if (!started && /^\/(?:start|step\/|chapter\/)/.test(path)) {started=true;emit('learning_start',{screen_id:path});}
   }
   function enable() {
-    if (active || !/^G-[A-Z0-9]+$/.test(id)) return;
+    if (active || !screen() || !/^G-[A-Z0-9]+$/.test(id)) return;
     active=true;window['ga-disable-'+id]=false;window.dataLayer=window.dataLayer||[];
     window.gtag=function(){window.dataLayer.push(arguments);};
     window.gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
     window.gtag('js',new Date());
     window.gtag('set',{page_location:location.origin+'/',page_referrer:'',page_title:'Claude CodeのSTEP'});
-    window.gtag('config',id,{send_page_view:false,allow_google_signals:false,allow_ad_personalization_signals:false,page_location:location.origin+'/',page_referrer:''});
+    window.gtag('config',id,{allow_google_signals:false,allow_ad_personalization_signals:false,page_location:location.origin+'/#'+screen(),page_referrer:''});
     var tag=document.createElement('script');tag.async=true;tag.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(tag);view();
   }
   window.stepAnalytics={view:view,copy:function(){emit('prompt_copy',{screen_id:screen()});}};
+  window.addEventListener('hashchange',function(){window['ga-disable-'+id]=!active||!screen();});
   document.addEventListener('click',function(e){var a=e.target.closest('a');if(a&&a.href==='https://lin.ee/8NRgx9E')emit('line_click',{screen_id:screen()});});
   document.addEventListener('DOMContentLoaded',function(){
     if(!/^G-[A-Z0-9]+$/.test(id))return;
