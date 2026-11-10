@@ -8,7 +8,11 @@
     if (raw.indexOf('?') !== -1) return null;
     var query=new URLSearchParams(location.search), safe=true;
     var campaigns={utm_source:['threads','instagram','tiktok','line','note','youtube','facebook','x'],utm_medium:['social','organic','referral','email','messaging'],utm_campaign:['step','claude-code-step']};
-    query.forEach(function(v,k){if(!campaigns[k]||campaigns[k].indexOf(v)===-1)safe=false;});
+    query.forEach(function(v,k){
+      if(k==='gtm_debug' && /^\d{13}$/.test(v) && query.getAll(k).length===1)return;
+      if(k==='_dbg' && v==='1' && query.getAll(k).length===1)return;
+      if(!campaigns[k]||campaigns[k].indexOf(v)===-1)safe=false;
+    });
     if(!safe)return null;
     if (!/^\/(?:|start|steps|chapters|questions|prompts|glossary|bookmarks|line(?:\/(?:first|safe|verify))?|final|step\/step-[0-7]|chapter\/chapter-(?:0[1-9]|1[0-6])|prompt\/[a-z0-9-]+|term\/[a-z0-9-]+|trouble\/[a-z0-9-]+)$/.test(raw)) return null;
     return raw;
