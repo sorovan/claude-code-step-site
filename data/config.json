@@ -17,6 +17,13 @@
       "shownIn": ["step-7"],
       "note": "2026-11-08確認：販売ページはGitHub運用スターターキットで、仕様書の『AI開発の指示文テンプレート集』（修正・レビュー・引き継ぎ）とは内容が一致しない。STEP 7への導線は不一致のため無効。GitHub寄りの内容としてSTEP 6側での利用可否を本人が判断する。"
     },
+    "n01Note": {
+      "label": "有料note「Claude Code初心者の実践ガイド」（¥980）",
+      "url": "https://note.com/shibusawa_eichi/n/ne03ab95bb6a8",
+      "enabled": true,
+      "shownIn": ["step-7"],
+      "note": "2026-11-10 公開確認：単品¥980の有料記事。購入ページ（note記事URL）。STEP側への反映はデプロイ承認後。paidNote（GitHub運用スターターキット）とは別物。"
+    },
     "coconala": {
       "label": "ココナラの出品ページを開く",
       "url": "https://coconala.com/services/4356310",
