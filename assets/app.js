@@ -243,6 +243,7 @@
 
   function copyText(text, button) {
     function ok() {
+      if (window.stepAnalytics && (!button || !button.hasAttribute('data-keyword-copy'))) window.stepAnalytics.copy();
       say("指示文をコピーしました。");
       if (button) flashButton(button, "コピーしました");
     }
@@ -1095,6 +1096,7 @@
     app.innerHTML = "";
     content.forEach(function (node) { if (node) app.appendChild(node); });
     document.title = titleText + " | Claude CodeのSTEP";
+    if (window.stepAnalytics) window.stepAnalytics.view();
     updateNav(path);
     if (focusTitle) {
       var h1 = app.querySelector("h1");
