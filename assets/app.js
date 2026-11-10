@@ -565,7 +565,7 @@
       toraSpeech.textContent = toraLines[toraIndex];
       say("TORAの案内を更新しました。");
     });
-    var children = [hero, stats, homeRoadmap(), homeStartSection(), lab, facts, progress, questionChips(), guideCard(), el("p", { class: "note home-note", text: state.config.siteNote })];
+    var children = [hero, stats, homeRoadmap(), homeStartSection(), lab, facts, progress, questionChips(), guideCard()];
     return [el("div", { class: "home-page" }, children)];
   }
 
