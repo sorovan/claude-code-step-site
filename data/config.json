@@ -32,11 +32,11 @@
       "note": "2026-11-08確認：出品は『AI開発の作業ルール整理』（変更範囲・完了報告・AI役割分担を1点のMDに整理、5,000円、納品3日予定）。STEP 4・5の作業範囲と完了報告の内容と一致するため有効化。価格は確認時点の表示。購入前に出品ページで再確認する。"
     },
     "membership": {
-      "label": "noteメンバーシップ（準備中）",
-      "url": "",
-      "enabled": false,
+      "label": "渋沢A壱の道具箱（noteメンバーシップ）",
+      "url": "https://note.com/shibusawa_eichi/membership",
+      "enabled": true,
       "shownIn": ["home", "step-7"],
-      "note": "2026-11-08時点で未開設。月額980円予定。URLが確定し公開されるまでURLは設定しない。準備中として表示する。"
+      "note": "公開中。月額770円。"
     },
     "officialLine": {
       "label": "公式LINEを開く",
