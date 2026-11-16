@@ -582,7 +582,7 @@
     var rows = [
       { name: "無料note", desc: "STEPの使い方と受け取り案内（無料）", key: "freeNote" },
       { name: "公式LINE", desc: "更新のお知らせ（任意。登録は必須ではありません）", key: "officialLine" },
-      { name: "noteメンバーシップ", desc: "追加教材・更新版・実践例（「AI開発の道具箱｜STEP実践室」、月額980円予定）", key: "membership" },
+      { name: "noteメンバーシップ", desc: "追加教材・更新版・実践例（「渋沢A壱の道具箱」、月額770円）", key: "membership" },
       { name: "ココナラ", desc: "個別のAI開発作業ルール整理（有料の個別相談）", key: "coconala" }
     ];
     var list = el("ul", { class: "guide-list" }, rows.map(function (r) {
